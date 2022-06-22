@@ -2,6 +2,7 @@ add_executable(jacscript
         main.c
         dmesg.c
         platform.c
+        pins.c
 
         "../build/version.c"
         "../jacdac-c/source/jd_control.c"
@@ -52,6 +53,7 @@ include_directories(AFTER
 target_link_libraries(jacscript 
         pico_stdlib
         pico_unique_id
+        hardware_pwm
         cmsis_core
 )
 

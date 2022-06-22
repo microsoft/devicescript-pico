@@ -22,7 +22,10 @@ static uint32_t hw_random(void) {
 }
 
 void platform_init(void) {
-    jd_seed_random(hw_random());
+    DMESG("JD init, %s", app_fw_version);
+    uint32_t r = hw_random();
+    DMESG("rand %x", r);
+    jd_seed_random(r);
 
     pico_unique_board_id_t id;
     pico_get_unique_board_id(&id);

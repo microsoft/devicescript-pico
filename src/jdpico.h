@@ -1,5 +1,6 @@
 #pragma once
 #include "jd_protocol.h"
+#include "services/interfaces/jd_pins.h"
 #include "pico/stdlib.h"
 #include "RP2040.h"
 
@@ -11,7 +12,6 @@ void reboot_to_uf2(void);
 void flush_dmesg(void);
 
 void init_sdcard(void);
-
 
 void platform_init(void);
 
