@@ -3,6 +3,7 @@ add_executable(jacscript
         dmesg.c
         platform.c
         pins.c
+        tim.c
 
         "../build/version.c"
         "../jacdac-c/source/jd_control.c"
