@@ -1,3 +1,6 @@
 [submodule "pico-sdk"]
 	path = pico-sdk
 	url = https://github.com/raspberrypi/pico-sdk
+[submodule "jacdac-c"]
+	path = jacdac-c
+	url = https://github.com/microsoft/jacdac-c
