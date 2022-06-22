@@ -1,5 +1,4 @@
-all: submodules
-	mkdir -p build
+all: submodules refresh-version
 	cd build && cmake ..
 	$(MAKE) -j16 -C build
 
@@ -20,3 +19,9 @@ jacdac-c/jacdac/README.md:
 pico-sdk/lib/tinyusb/README.md:
 	git submodule update --init
 	cd pico-sdk && git submodule update --init
+
+refresh-version:
+	@mkdir -p build
+	echo 'const char app_fw_version[] = "v$(FW_VERSION)";' > build/version-tmp.c
+	@diff build/version.c build/version-tmp.c >/dev/null 2>/dev/null || \
+		(echo "refresh version"; cp build/version-tmp.c build/version.c)

@@ -1,6 +1,8 @@
-#include "pico/stdlib.h"
+#include "jdpico.h"
 
 int main() {
+    platform_init();
+    
     const uint LED_PIN = 11;
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
