@@ -1,5 +1,12 @@
 #include "jdpico.h"
 #include "hardware/structs/rosc.h"
+#include "pico/unique_id.h"
+#include "pico/bootrom.h"
+
+#include <stdlib.h>
+
+static uint64_t _jd_device_id;
+static int8_t irq_disabled;
 
 static uint32_t hw_random(void) {
     uint8_t buf[16];
@@ -16,4 +23,71 @@ static uint32_t hw_random(void) {
 
 void platform_init(void) {
     jd_seed_random(hw_random());
+
+    pico_unique_board_id_t id;
+    pico_get_unique_board_id(&id);
+    JD_ASSERT(sizeof(_jd_device_id) == sizeof(id));
+    memcpy(&_jd_device_id, &id, sizeof(_jd_device_id));
+}
+
+int jd_pin_num(void) {
+    return PIN_JACDAC;
+}
+
+uint64_t jd_device_id(void) {
+    return _jd_device_id;
+}
+
+void jd_alloc_stack_check(void) {}
+void jd_alloc_init(void) {}
+
+void *jd_alloc(uint32_t size) {
+    return calloc(size, 1);
+}
+
+void jd_free(void *ptr) {
+    free(ptr);
+}
+
+void *jd_alloc_emergency_area(uint32_t size) {
+    return calloc(size, 1);
+}
+
+void target_reset(void) {
+    NVIC_SystemReset();
+}
+
+void target_wait_us(uint32_t n) {
+    busy_wait_us_32(n);
+}
+
+void hw_panic(void) {
+    DMESG("HW PANIC!");
+    abort();
+}
+
+void reboot_to_uf2(void) {
+    DMESG("uf2 reset");
+    reset_usb_boot(0, 0);
+}
+
+void target_enable_irq(void) {
+    irq_disabled--;
+    if (irq_disabled <= 0) {
+        irq_disabled = 0;
+        asm volatile("cpsie i" : : : "memory");
+    }
+}
+
+void target_disable_irq(void) {
+    asm volatile("cpsid i" : : : "memory");
+    irq_disabled++;
+}
+
+int target_in_irq(void) {
+    return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0;
+}
+
+void __libc_init_array(void) {
+    // do nothing - not using static constructors
 }

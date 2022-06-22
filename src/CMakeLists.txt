@@ -49,7 +49,11 @@ include_directories(AFTER
 )
 
 # pull in common dependencies
-target_link_libraries(jacscript pico_stdlib)
+target_link_libraries(jacscript 
+        pico_stdlib
+        pico_unique_id
+        cmsis_core
+)
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(jacscript)

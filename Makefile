@@ -25,3 +25,6 @@ refresh-version:
 	echo 'const char app_fw_version[] = "v$(FW_VERSION)";' > build/version-tmp.c
 	@diff build/version.c build/version-tmp.c >/dev/null 2>/dev/null || \
 		(echo "refresh version"; cp build/version-tmp.c build/version.c)
+
+clean:
+	rm -rf build
