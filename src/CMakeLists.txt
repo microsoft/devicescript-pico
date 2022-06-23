@@ -4,6 +4,8 @@ add_executable(jacscript
         platform.c
         pins.c
         tim.c
+        uart.c
+        dma.c
 
         "../build/version.c"
         "../jacdac-c/source/jd_control.c"
@@ -43,6 +45,8 @@ add_executable(jacscript
         "../jacdac-c/storage/crc32.c"
 )
 
+pico_generate_pio_header(jacscript ${CMAKE_CURRENT_LIST_DIR}/sws.pio)
+
 include_directories(AFTER
         "."
         "../jacdac-c/inc"
@@ -55,6 +59,9 @@ target_link_libraries(jacscript
         pico_stdlib
         pico_unique_id
         hardware_pwm
+        hardware_pio
+        hardware_dma
+        hardware_irq
         cmsis_core
 )
 

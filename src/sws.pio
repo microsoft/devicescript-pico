@@ -1,0 +1,31 @@
+; NOTE: use LF for pio file
+; pio implement of 1M baud uart for jacdac
+; regenerate command:
+; pioasm sws.pio sws.pio.h
+
+.program jd_tx
+.side_set 1 opt
+
+  pull          side 1  [7] ;
+  set x, 7      side 0  [7] ;
+bitloop:
+  out pins, 1               ;
+  jmp x-- bitloop       [6] ;
+
+.program jd_rx
+.side_set 1 opt
+start:
+  wait 0 pin 0        ; Stall until start bit is asserted
+  set x, 7 side 0 [7]    ; Preload bit counter, then delay until halfway through
+  nop [3]
+bitloop:              ; the first data bit (12 cycles incl wait, set).
+  in pins, 1          ; Shift data bit into ISR
+  jmp x-- bitloop [6] ; Loop 8 times, each loop iteration is 8 cycles
+  jmp pin good_stop side 1  ; Check stop bit (should be high)
+  irq 1 side 0        ; Either a framing error or a break. Set a sticky flag,
+  wait 1 pin 0        ; and wait for line to return to idle state.
+  jmp start side 1          ; Don't push data if we didn't see good framing.
+
+good_stop:              ; No delay before returning to start; a little slack is
+  nop                ; important in case the TX clock is slightly too fast.
+

@@ -15,7 +15,8 @@ void init_sdcard(void);
 
 void platform_init(void);
 
-// without #, GCC now appends "aw",@progbits'
-// with the #, GCC comments out this appended directive
-// see: https://gcc.gnu.org/legacy-ml/gcc-help/2010-09/msg00088.html
-#define RAM_FUNC __attribute__((noinline, long_call, section(".data#")))
+#define REAL_TIME_FUNC __attribute__((section(".time_critical.sws")))
+
+typedef void (*cb_arg_t)(void *);
+void dma_set_ch_cb(uint8_t channel, cb_arg_t handler, void *context);
+void ram_irq_set_enabled(uint num, bool enabled);
