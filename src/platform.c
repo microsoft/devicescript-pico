@@ -60,10 +60,6 @@ void target_reset(void) {
     NVIC_SystemReset();
 }
 
-void target_wait_us(uint32_t n) {
-    busy_wait_us_32(n);
-}
-
 void hw_panic(void) {
     DMESG("HW PANIC!");
     abort();

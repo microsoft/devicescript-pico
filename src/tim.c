@@ -48,3 +48,10 @@ void tim_set_timer(int delta, cb_t cb) {
 uint64_t tim_get_micros() {
     return time_us_64();
 }
+
+REAL_TIME_FUNC
+void target_wait_us(uint32_t n) {
+    uint32_t start = timer_hw->timerawl;
+    while (timer_hw->timerawl - start < n)
+        ;
+}

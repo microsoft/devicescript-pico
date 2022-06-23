@@ -102,11 +102,17 @@ COPY void pio_sm_init_(PIO pio, uint sm, uint initial_pc, const pio_sm_config *c
     pio_sm_exec(pio, sm, pio_encode_jmp(initial_pc));
 }
 
+static inline void rx_done(void) {
+    if (status & STATUS_RX) {
+        status &= ~STATUS_RX;
+        uart_disable();
+        jd_rx_completed(0);
+    }
+}
+
 REAL_TIME_FUNC
 static void rx_handler(void *p) {
-    if (status & STATUS_RX) {
-        // ...
-    }
+    rx_done();
 }
 
 REAL_TIME_FUNC
@@ -114,7 +120,18 @@ static void tx_handler(void *p) {
     // wait for the data to be actually sent
     while (!(pio0->fdebug & (1u << (PIO_FDEBUG_TXSTALL_LSB + smtx))))
         ;
-    // ...
+
+    // send final BRK
+    pin_set(PIN_JACDAC, 1);
+    pin_setup_output(PIN_JACDAC);
+    pin_setup_output_af(PIN_JACDAC, GPIO_FUNC_SIO);
+    target_wait_us(1);
+    pin_set(PIN_JACDAC, 0);
+    target_wait_us(12);
+    pin_set(PIN_JACDAC, 1);
+    uart_disable();
+
+    jd_tx_completed(0);
 }
 
 REAL_TIME_FUNC
@@ -122,7 +139,7 @@ void isr_pio0_0() {
     uint32_t n = pio0->irq;
     pio0->irq = n;
     if (n & PIO_BREAK_IRQ) {
-        // ...
+        rx_done();
     }
 }
 
@@ -225,8 +242,13 @@ void uart_init_() {
 }
 
 int uart_wait_high(void) {
-    // TODO
-    return 0;
+    int timeout = 50000;
+    while (timeout-- > 0 && !pin_get(PIN_JACDAC))
+        ;
+    if (timeout <= 0)
+        return -1;
+    else
+        return 0;
 }
 
 void uart_flush_rx() {}
