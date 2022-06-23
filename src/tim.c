@@ -1,4 +1,5 @@
 #include "jdpico.h"
+#include "hardware/irq.h"
 
 #define ALARM_NUM 0
 uint16_t tim_max_sleep;
@@ -13,7 +14,15 @@ static void tim_handler(uint num) {
         f();
 }
 
+static inline uint harware_alarm_irq_number(uint alarm_num) {
+    return TIMER_IRQ_0 + alarm_num;
+}
+
 void tim_init() {
+    uint irq_num = harware_alarm_irq_number(ALARM_NUM);
+    ram_irq_set_priority(irq_num, IRQ_PRIORITY_TIM);
+    ram_irq_set_enabled(irq_num, true);
+
     hardware_alarm_claim(ALARM_NUM);
     hardware_alarm_set_callback(ALARM_NUM, tim_handler);
 }

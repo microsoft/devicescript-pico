@@ -161,6 +161,7 @@ static void jd_rx_arm_pin(PIO pio, uint sm, uint pin) {
 #else
     pio_sm_set_consecutive_pindirs_(pio, sm, pin, 1, false);
 #endif
+    exti_disable(PIN_JACDAC);
     pio_gpio_init_(pio, pin);
     pin_set_pull(pin, PIN_PULL_UP);
 }
@@ -213,9 +214,14 @@ void uart_init_() {
     channel_config_set_dreq(&c, pio_get_dreq(pio0, smtx, true));
     dma_channel_configure(dmachTx, &c, &pio0->txf[smtx], NULL, 0, false);
     // pio irq for dma rx break handling
-    ram_irq_set_enabled(PIO0_IRQ_0, true);
 
     exti_set_callback(PIN_JACDAC, jd_line_falling, EXTI_FALLING);
+
+    ram_irq_set_priority(DMA_IRQ_0, IRQ_PRIORITY_UART);
+    ram_irq_set_priority(PIO0_IRQ_0, IRQ_PRIORITY_UART);
+    ram_irq_set_enabled(PIO0_IRQ_0, true);
+
+    uart_disable();
 }
 
 int uart_wait_high(void) {
@@ -228,20 +234,50 @@ void uart_flush_rx() {}
 REAL_TIME_FUNC
 void uart_disable() {
     status = STATUS_IDLE;
+    target_disable_irq();
     dma_hw->abort = (1 << dmachRx) | (1 << dmachTx);
     pin_setup_output_af(PIN_JACDAC, GPIO_FUNC_SIO); // release gpio
     pio_sm_set_enabled(pio0, smtx, false);
     pio_sm_set_enabled(pio0, smrx, false);
     pio_set_irq0_source_enabled(pio0, pis_interrupt1, false);
+    exti_enable(PIN_JACDAC);
+    target_enable_irq();
+}
+
+// This is extracted to a function to make sure the compiler doesn't
+// insert stuff between checking the input pin and setting the mode.
+REAL_TIME_FUNC
+__attribute__((noinline)) uint32_t gpio_probe_and_set(sio_hw_t *hw, uint32_t pin) {
+    return (hw->gpio_oe_set = hw->gpio_in & pin);
 }
 
 REAL_TIME_FUNC
 int uart_start_tx(const void *data, uint32_t len) {
+    exti_disable(PIN_JACDAC);
+    // We assume EXTI runs at higher priority than us
+    // If we got hit by EXTI, before we managed to disable it,
+    // the reception routine would have enabled UART in RX mode
+    if (status & STATUS_RX) {
+        // we don't re-enable EXTI - the RX complete will do it
+        return -1;
+    }
+    JD_ASSERT(status == 0);
     status = STATUS_TX;
-    jd_tx_arm_pin(pio0, smtx, PIN_JACDAC);
-    // jd_tx_program_init(pio0, smtx, txprog, PIN_JACDAC, baudrate);
-    pio_sm_set_enabled(pio0, smtx, true);
+    pin_set(PIN_JACDAC, 0);
+    if (!gpio_probe_and_set(sio_hw, (1 << PIN_JACDAC))) {
+        // this is equivalent to irq priority when running from EXTI
+        target_disable_irq();
+        jd_line_falling();
+        target_enable_irq();
+        return -1;
+    }
+    target_wait_us(11);
+    pin_set(PIN_JACDAC, 1);
 
+    target_wait_us(45); // TODO check
+
+    jd_tx_arm_pin(pio0, smtx, PIN_JACDAC);
+    pio_sm_set_enabled(pio0, smtx, true);
     dma_set_ch_cb(dmachTx, tx_handler, NULL);
     dma_channel_transfer_from_buffer_now(dmachTx, data, len);
 

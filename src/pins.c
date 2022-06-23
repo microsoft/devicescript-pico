@@ -1,5 +1,6 @@
 #include "jdpico.h"
 #include "hardware/pwm.h"
+#include "hardware/irq.h"
 #include "hardware/structs/iobank0.h"
 
 static cb_t exti_cb[NUM_BANK0_GPIOS];
@@ -160,6 +161,9 @@ void exti_set_callback(uint8_t pin, cb_t callback, uint32_t flags) {
         events |= GPIO_IRQ_EDGE_RISE;
     exti_ev[pin] = events;
     gpio_set_irq_enabled_(pin, events, true);
+
+    ram_irq_set_enabled(IO_IRQ_BANK0, true);
+    ram_irq_set_priority(IO_IRQ_BANK0, IRQ_PRIORITY_EXTI);
 }
 
 void exti_disable(uint8_t pin) {
