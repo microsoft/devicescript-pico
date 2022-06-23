@@ -2,6 +2,9 @@
 #include "hardware/pwm.h"
 #include "hardware/structs/iobank0.h"
 
+static cb_t exti_cb[NUM_BANK0_GPIOS];
+static uint8_t exti_ev[NUM_BANK0_GPIOS];
+
 #define COPY static __attribute__((section(".time_critical.gpio")))
 
 static __force_inline void gpio_acknowledge_irq_(uint gpio, uint32_t events) {
@@ -9,7 +12,7 @@ static __force_inline void gpio_acknowledge_irq_(uint gpio, uint32_t events) {
 }
 
 static __force_inline void _gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled,
-                                          io_irq_ctrl_hw_t *irq_ctrl_base) {
+                                                 io_irq_ctrl_hw_t *irq_ctrl_base) {
     // Clear stale events which might cause immediate spurious handler entry
     gpio_acknowledge_irq_(gpio, events);
 
@@ -53,6 +56,20 @@ static __force_inline void gpio_set_pulls_(uint gpio, bool up, bool down) {
                     (bool_to_bit(up) << PADS_BANK0_GPIO0_PUE_LSB) |
                         (bool_to_bit(down) << PADS_BANK0_GPIO0_PDE_LSB),
                     PADS_BANK0_GPIO0_PUE_BITS | PADS_BANK0_GPIO0_PDE_BITS);
+}
+
+REAL_TIME_FUNC
+void isr_io_bank0() {
+    io_irq_ctrl_hw_t *irq_ctrl_base = &iobank0_hw->proc0_irq_ctrl; // assume io irq only on core0
+    for (uint gpio = 0; gpio < NUM_BANK0_GPIOS; gpio++) {
+        const io_rw_32 *status_reg = &irq_ctrl_base->ints[gpio / 8];
+        uint events = (*status_reg >> 4 * (gpio % 8)) & 0xf;
+        if (events) {
+            gpio_acknowledge_irq(gpio, events);
+            if (exti_cb[gpio])
+                exti_cb[gpio]();
+        }
+    }
 }
 
 uint8_t jd_pwm_init(uint8_t pin, uint32_t period, uint32_t duty, uint8_t prescaler) {
@@ -133,3 +150,22 @@ void pin_setup_output_af(int pin, int af) {
 void pwr_enter_no_sleep(void) {}
 void pwr_enter_tim(void) {}
 void pwr_leave_tim(void) {}
+
+void exti_set_callback(uint8_t pin, cb_t callback, uint32_t flags) {
+    exti_cb[pin] = callback;
+    uint8_t events = 0;
+    if (flags & EXTI_FALLING)
+        events |= GPIO_IRQ_EDGE_FALL;
+    if (flags & EXTI_RISING)
+        events |= GPIO_IRQ_EDGE_RISE;
+    exti_ev[pin] = events;
+    gpio_set_irq_enabled_(pin, events, true);
+}
+
+void exti_disable(uint8_t pin) {
+    gpio_set_irq_enabled(pin, exti_ev[pin], false);
+}
+
+void exti_enable(uint8_t pin) {
+    gpio_set_irq_enabled(pin, exti_ev[pin], true);
+}
