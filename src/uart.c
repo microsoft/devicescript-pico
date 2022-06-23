@@ -24,30 +24,10 @@ static uint8_t smtx = 0;
 static uint8_t smrx = 1;
 static uint16_t status;
 
-COPY void gpio_set_function_(uint gpio, enum gpio_function fn) {
-    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
-    invalid_params_if(GPIO, ((uint32_t)fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB) &
-                                ~IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS);
-    // Set input enable on, output disable off
-    hw_write_masked(&padsbank0_hw->io[gpio], PADS_BANK0_GPIO0_IE_BITS,
-                    PADS_BANK0_GPIO0_IE_BITS | PADS_BANK0_GPIO0_OD_BITS);
-    // Zero all fields apart from fsel; we want this IO to do what the peripheral tells it.
-    // This doesn't affect e.g. pullup/pulldown, as these are in pad controls.
-    iobank0_hw->io[gpio].ctrl = fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB;
-}
-
-COPY void gpio_set_pulls_(uint gpio, bool up, bool down) {
-    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
-    hw_write_masked(&padsbank0_hw->io[gpio],
-                    (bool_to_bit(up) << PADS_BANK0_GPIO0_PUE_LSB) |
-                        (bool_to_bit(down) << PADS_BANK0_GPIO0_PDE_LSB),
-                    PADS_BANK0_GPIO0_PUE_BITS | PADS_BANK0_GPIO0_PDE_BITS);
-}
-
 static inline void pio_gpio_init_(PIO pio, uint pin) {
     check_pio_param(pio);
     valid_params_if(PIO, pin < 32);
-    gpio_set_function_(pin, pio == pio0 ? GPIO_FUNC_PIO0 : GPIO_FUNC_PIO1);
+    pin_setup_output_af(pin, pio == pio0 ? GPIO_FUNC_PIO0 : GPIO_FUNC_PIO1);
 }
 
 COPY void pio_sm_set_consecutive_pindirs_(PIO pio, uint sm, uint pin, uint count, bool is_out) {
@@ -182,7 +162,7 @@ static void jd_rx_arm_pin(PIO pio, uint sm, uint pin) {
     pio_sm_set_consecutive_pindirs_(pio, sm, pin, 1, false);
 #endif
     pio_gpio_init_(pio, pin);
-    gpio_set_pulls_(pin, true, false);
+    pin_set_pull(pin, PIN_PULL_UP);
 }
 
 REAL_TIME_FUNC
@@ -234,6 +214,8 @@ void uart_init_() {
     dma_channel_configure(dmachTx, &c, &pio0->txf[smtx], NULL, 0, false);
     // pio irq for dma rx break handling
     ram_irq_set_enabled(PIO0_IRQ_0, true);
+
+    exti_set_callback(PIN_JACDAC, jd_line_falling, EXTI_FALLING);
 }
 
 int uart_wait_high(void) {
@@ -247,7 +229,7 @@ REAL_TIME_FUNC
 void uart_disable() {
     status = STATUS_IDLE;
     dma_hw->abort = (1 << dmachRx) | (1 << dmachTx);
-    gpio_set_function_(PIN_JACDAC, GPIO_FUNC_SIO); // release gpio
+    pin_setup_output_af(PIN_JACDAC, GPIO_FUNC_SIO); // release gpio
     pio_sm_set_enabled(pio0, smtx, false);
     pio_sm_set_enabled(pio0, smrx, false);
     pio_set_irq0_source_enabled(pio0, pis_interrupt1, false);
