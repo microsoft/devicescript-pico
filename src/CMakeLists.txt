@@ -6,6 +6,7 @@ add_executable(jacscript
         tim.c
         uart.c
         dma.c
+        flash.c
 
         "../build/version.c"
         "../jacdac-c/source/jd_control.c"

@@ -30,7 +30,8 @@
 
 #define JD_RAW_FRAME 1
 
-#define JD_FLASH_PAGE_SIZE 1024
+// this is min. erase size
+#define JD_FLASH_PAGE_SIZE 4096
 
 void hf2_send_frame(const void *frame);
 // #define JD_BRIDGE_SEND hf2_send_frame
