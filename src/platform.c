@@ -31,6 +31,9 @@ void platform_init(void) {
     pico_get_unique_board_id(&id);
     JD_ASSERT(sizeof(_jd_device_id) == sizeof(id));
     memcpy(&_jd_device_id, &id, sizeof(_jd_device_id));
+
+    tim_init();
+    uart_init_();
 }
 
 int jd_pin_num(void) {
