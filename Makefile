@@ -8,7 +8,7 @@ all: submodules refresh-version
 r: flash
 f: flash
 
-flash: all
+flash: all boot
 	cp build/src/jacscript.uf2 /Volumes/RPI-RP2
 
 submodules: pico-sdk/lib/tinyusb/README.rst jacdac-c/jacdac/README.md
@@ -40,6 +40,14 @@ prep-build-gdb:
 	echo "monitor connect_srst disable" >> build/debug.gdb
 	echo "monitor swdp_scan" >> build/debug.gdb
 	echo "attach 1" >> build/debug.gdb
+
+boot: prep-build-gdb
+	echo 'set $$pc=0x25b5' >> build/debug.gdb
+	echo 'set $$r0=0' >> build/debug.gdb
+	echo 'set $$r1=0' >> build/debug.gdb
+	echo "quit" >> build/debug.gdb
+	arm-none-eabi-gdb --command=build/debug.gdb $(ELF) < /dev/null
+	sleep 2
 
 gdb: prep-build-gdb
 	arm-none-eabi-gdb --command=build/debug.gdb $(ELF)
