@@ -14,7 +14,7 @@ static power_config_t pwr_cfg = {
     .pin_fault = PIN_PWR_FAULT, // active low
     .pin_en = PIN_PWR_EN,
     .pin_pulse = NO_PIN,
-    .en_active_high = 1,
+    .en_active_high = 2,
     .fault_ignore_ms = 100, // there 4.7uF cap that takes time to charge
 };
 #endif

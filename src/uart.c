@@ -201,6 +201,10 @@ static void jd_rx_program_init(PIO pio, uint sm, uint offset, uint pin, uint bau
 }
 
 void uart_init_() {
+    pin_set(PIN_JACDAC, 1);
+    pin_setup_output(PIN_JACDAC); // yank it up
+    pin_setup_input(PIN_JACDAC, PIN_PULL_UP); // and keep it up
+
     txprog = pio_add_program(pio0, &jd_tx_program);
     rxprog = pio_add_program(pio0, &jd_rx_program);
 
@@ -258,6 +262,7 @@ void uart_disable() {
     status = STATUS_IDLE;
     target_disable_irq();
     dma_hw->abort = (1 << dmachRx) | (1 << dmachTx);
+    pin_setup_input(PIN_JACDAC, PIN_PULL_UP);
     pin_setup_output_af(PIN_JACDAC, GPIO_FUNC_SIO); // release gpio
     pio_sm_set_enabled(pio0, smtx, false);
     pio_sm_set_enabled(pio0, smrx, false);
@@ -293,10 +298,10 @@ int uart_start_tx(const void *data, uint32_t len) {
         target_enable_irq();
         return -1;
     }
-    target_wait_us(11);
+    target_wait_us(12);
     pin_set(PIN_JACDAC, 1);
 
-    target_wait_us(45); // TODO check
+    target_wait_us(49);
 
     jd_tx_arm_pin(pio0, smtx, PIN_JACDAC);
     pio_sm_set_enabled(pio0, smtx, true);

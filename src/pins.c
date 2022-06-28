@@ -106,9 +106,22 @@ void pin_set(int pin, int v) {
 }
 
 REAL_TIME_FUNC
+void pin_pulse(int pin, int num) {
+    if ((uint8_t)pin == NO_PIN)
+        return;
+    pin_setup_output(pin);
+    while (num--) {
+        gpio_put(pin, 1);
+        gpio_put(pin, 0);
+    }
+}
+
+REAL_TIME_FUNC
 void pin_setup_output(int pin) {
-    if ((uint8_t)pin != NO_PIN)
+    if ((uint8_t)pin != NO_PIN) {
         gpio_set_dir(pin, 1);
+        gpio_set_function_(pin, GPIO_FUNC_SIO);
+    }
 }
 
 REAL_TIME_FUNC
@@ -124,6 +137,7 @@ void pin_setup_input(int pin, int pull) {
         return;
     pin_set_pull(pin, pull);
     gpio_set_dir(pin, 0);
+    gpio_set_function_(pin, GPIO_FUNC_SIO);
 }
 
 REAL_TIME_FUNC

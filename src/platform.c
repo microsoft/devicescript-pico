@@ -63,13 +63,36 @@ void target_reset(void) {
     NVIC_SystemReset();
 }
 
+static void led_panic_blink(void) {
+#ifdef PIN_LED_R
+    // TODO should we actually PWM?
+    pin_setup_output(PIN_LED_R);
+    // it doesn't actually matter if LED_RGB_COMMON_CATHODE is defined, as we're just blinking
+    pin_set(PIN_LED_R, 0);
+    target_wait_us(70000);
+    pin_set(PIN_LED_R, 1);
+    target_wait_us(70000);
+#else
+    pin_setup_output(PIN_LED);
+    pin_setup_output(PIN_LED_GND);
+    pin_set(PIN_LED_GND, 0);
+    pin_set(PIN_LED, 1);
+    target_wait_us(70000);
+    pin_set(PIN_LED, 0);
+    target_wait_us(70000);
+#endif
+}
+
 void hw_panic(void) {
     DMESG("HW PANIC!");
-    abort();
+    target_disable_irq();
+    for (int i = 0; i < 60; ++i) {
+        led_panic_blink();
+    }
+    target_reset();
 }
 
 void reboot_to_uf2(void) {
-    DMESG("uf2 reset");
     reset_usb_boot(0, 0);
 }
 
