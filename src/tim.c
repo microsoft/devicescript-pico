@@ -9,9 +9,22 @@ static cb_t timer_cb;
 static void tim_handler(uint num) {
     (void)num;
     cb_t f = timer_cb;
-    timer_cb = NULL;
-    if (f)
+    if (f) {
+        target_disable_irq();
+        uint32_t tal = timer_hw->alarm[ALARM_NUM];
+        uint32_t now = timer_hw->timerawl;
+        if (((tal - (now + 2)) >> 29) == 0) {
+            // re-arm the alarm
+            timer_hw->alarm[ALARM_NUM] = tal;
+            DMESG("timer problem: al=%u now=%u", tal, now);
+            target_enable_irq();
+            return;
+        }
+        target_enable_irq();
+
+        timer_cb = NULL;
         f();
+    }
 }
 
 static inline uint harware_alarm_irq_number(uint alarm_num) {
