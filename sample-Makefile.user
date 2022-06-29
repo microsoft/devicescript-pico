@@ -1,0 +1,3 @@
+# BMP_PORT = $(shell ls -1 /dev/cu.usbmodem????????1 | head -1) # macOS
+# BMP_PORT = //./COM10 # Windows
+# COMPILE_OPTIONS = -DJD_INFINITE_PANIC=1

@@ -86,10 +86,15 @@ static void led_panic_blink(void) {
 void hw_panic(void) {
     DMESG("HW PANIC!");
     target_disable_irq();
-    for (int i = 0; i < 60; ++i) {
+#ifdef JD_INFINITE_PANIC
+    for (;;)
+        led_panic_blink();
+#else
+    for (int i = 0; i < 60000000; ++i) {
         led_panic_blink();
     }
     target_reset();
+#endif
 }
 
 void reboot_to_uf2(void) {

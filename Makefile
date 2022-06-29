@@ -1,4 +1,7 @@
-BMP_PORT ?= $(shell ls -1 /dev/cu.usbmodem????????1 | head -1)
+_IGNORE0 := $(shell test -f Makefile.user || cp sample-Makefile.user Makefile.user)
+
+include Makefile.user
+
 ELF = build/src/jacscript.elf
 
 all: submodules refresh-version
@@ -11,7 +14,7 @@ f: flash
 flash: all boot
 	cp build/src/jacscript.uf2 /Volumes/RPI-RP2
 
-submodules: pico-sdk/lib/tinyusb/README.rst jacdac-c/jacdac/README.md
+submodules: pico-sdk/lib/tinyusb/README.rst jacdac-c/jacdac/README.md build/config.cmake
 
 # don't do --recursive - we don't want all tinyusb submodules
 
@@ -22,6 +25,10 @@ jacdac-c/jacdac/README.md:
 pico-sdk/lib/tinyusb/README.rst:
 	git submodule update --init
 	cd pico-sdk && git submodule update --init
+
+build/config.cmake: Makefile Makefile.user
+	mkdir -p build
+	echo "add_compile_options($(COMPILE_OPTIONS))" > $@
 
 refresh-version:
 	@mkdir -p build
