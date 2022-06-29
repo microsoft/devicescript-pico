@@ -117,7 +117,9 @@ static void rx_handler(void *p) {
 
 REAL_TIME_FUNC
 static void tx_handler(void *p) {
-    // wait for the data to be actually sent
+    // first clear any pending stalls
+    pio0->fdebug = (1u << (PIO_FDEBUG_TXSTALL_LSB + smtx));
+    // wait for the data to be actually sent - wait for stall
     while (!(pio0->fdebug & (1u << (PIO_FDEBUG_TXSTALL_LSB + smtx))))
         ;
 
@@ -202,7 +204,7 @@ static void jd_rx_program_init(PIO pio, uint sm, uint offset, uint pin, uint bau
 
 void uart_init_() {
     pin_set(PIN_JACDAC, 1);
-    pin_setup_output(PIN_JACDAC); // yank it up
+    pin_setup_output(PIN_JACDAC);             // yank it up
     pin_setup_input(PIN_JACDAC, PIN_PULL_UP); // and keep it up
 
     txprog = pio_add_program(pio0, &jd_tx_program);
