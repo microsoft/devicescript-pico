@@ -40,20 +40,30 @@ void isr_dma_0() {
     dma_hw->ints0 = mask;
     for (uint8_t ch = 0; ch < 12; ch++) {
         if ((1 << ch) & mask) {
-            if (dmaHandler[ch].handler) {
+            cb_arg_t f = dmaHandler[ch].handler;
+            if (f) {
                 dma_channel_set_irq0_enabled(ch, false);
-                dmaHandler[ch].handler(dmaHandler[ch].context);
+                dmaHandler[ch].handler = NULL;
+                f(dmaHandler[ch].context);
             }
         }
     }
 }
 
 REAL_TIME_FUNC
+void dma_dump(void) {
+    DMESG("DMA ints0=%x inte0=%x en=%d", dma_hw->ints0, dma_hw->inte0,
+          (int)irq_is_enabled(DMA_IRQ_0));
+}
+
+REAL_TIME_FUNC
 void dma_set_ch_cb(uint8_t channel, cb_arg_t handler, void *context) {
     if (channel >= 12)
         return;
+    JD_ASSERT(!dmaHandler[channel].handler);
     dmaHandler[channel].handler = handler;
     dmaHandler[channel].context = context;
+    dma_hw->ints0 = (1 << DMA_IRQ_0); // clear any pending irq
     dma_channel_set_irq0_enabled(channel, true);
     ram_irq_set_enabled(DMA_IRQ_0, true);
 }
