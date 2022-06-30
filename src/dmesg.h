@@ -18,7 +18,7 @@ extern "C" {
 
 struct CodalLogStore
 {
-    uint32_t ptr;
+    volatile uint32_t ptr;
     char buffer[DEVICE_DMESG_BUFFER_SIZE];
 };
 extern struct CodalLogStore codalLogStore;

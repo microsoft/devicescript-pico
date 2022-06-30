@@ -34,6 +34,8 @@ void platform_init(void) {
 
     tim_init();
     uart_init_();
+
+    usb_init();
 }
 
 int jd_pin_num(void) {

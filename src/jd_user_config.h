@@ -34,7 +34,7 @@
 #define JD_FLASH_PAGE_SIZE 4096
 
 void hf2_send_frame(const void *frame);
-// #define JD_BRIDGE_SEND hf2_send_frame
+#define JD_BRIDGE_SEND hf2_send_frame
 
 // probably not so useful on brains...
 #define JD_CONFIG_WATCHDOG 0

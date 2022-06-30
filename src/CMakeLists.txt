@@ -7,6 +7,9 @@ add_executable(jacscript
         uart.c
         dma.c
         flash.c
+        hf2.c
+        usb.c
+        usb_descriptors.c
 
         "../build/version.c"
         "../jacdac-c/source/jd_control.c"
@@ -64,6 +67,7 @@ target_link_libraries(jacscript
         hardware_dma
         hardware_irq
         cmsis_core
+        tinyusb_device
 )
 
 # create map/bin/hex file etc.
