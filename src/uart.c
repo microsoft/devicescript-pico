@@ -22,7 +22,7 @@ static int dmachRx = -1;
 static uint txprog, rxprog;
 static uint8_t smtx = 0;
 static uint8_t smrx = 1;
-static uint16_t status;
+static uint16_t uart_status;
 
 static inline void pio_gpio_init_(PIO pio, uint pin) {
     check_pio_param(pio);
@@ -103,8 +103,8 @@ COPY void pio_sm_init_(PIO pio, uint sm, uint initial_pc, const pio_sm_config *c
 }
 
 static inline void rx_done(void) {
-    if (status & STATUS_RX) {
-        status &= ~STATUS_RX;
+    if (uart_status & STATUS_RX) {
+        uart_status &= ~STATUS_RX;
         uart_disable();
         jd_rx_completed(0);
     }
@@ -261,7 +261,7 @@ void uart_flush_rx() {}
 
 REAL_TIME_FUNC
 void uart_disable() {
-    status = STATUS_IDLE;
+    uart_status = STATUS_IDLE;
     target_disable_irq();
     dma_hw->abort = (1 << dmachRx) | (1 << dmachTx);
     pin_setup_input(PIN_JACDAC, PIN_PULL_UP);
@@ -286,12 +286,12 @@ int uart_start_tx(const void *data, uint32_t len) {
     // We assume EXTI runs at higher priority than us
     // If we got hit by EXTI, before we managed to disable it,
     // the reception routine would have enabled UART in RX mode
-    if (status & STATUS_RX) {
+    if (uart_status & STATUS_RX) {
         // we don't re-enable EXTI - the RX complete will do it
         return -1;
     }
-    JD_ASSERT(status == 0);
-    status = STATUS_TX;
+    JD_ASSERT(uart_status == 0);
+    uart_status = STATUS_TX;
     pin_set(PIN_JACDAC, 0);
     if (!gpio_probe_and_set(sio_hw, (1 << PIN_JACDAC))) {
         // this is equivalent to irq priority when running from EXTI
@@ -318,7 +318,7 @@ int uart_start_tx(const void *data, uint32_t len) {
 
 REAL_TIME_FUNC
 void uart_start_rx(void *data, uint32_t len) {
-    status = STATUS_RX;
+    uart_status = STATUS_RX;
     jd_rx_arm_pin(pio0, smrx, PIN_JACDAC);
     // jd_rx_program_init(pio0, smrx, rxprog, PIN_JACDAC, baudrate);
     pio_sm_set_enabled(pio0, smrx, true);
