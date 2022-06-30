@@ -3,6 +3,7 @@
 #include "hardware/irq.h"
 #include "hardware/dma.h"
 #include "hardware/pio.h"
+#include "hardware/clocks.h"
 #include "sws.pio.h"
 
 // based on
@@ -15,7 +16,7 @@
 #define STATUS_RX 0x20
 
 #define PIO_BREAK_IRQ 0x2
-// #define DEBUG_PIN
+// #define DEBUG_PIN 6
 
 static int dmachTx = -1;
 static int dmachRx = -1;
@@ -163,7 +164,7 @@ static void jd_tx_program_init(PIO pio, uint sm, uint offset, uint pin, uint bau
     // limit the size of the TX fifo - it's filled by DMA anyway and we have to busy-wait for it
     // flush
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_NONE);
-    float div = (float)125000000 / (8 * baud);
+    float div = (float)clock_get_hz(clk_sys) / (8 * baud);
     sm_config_set_clkdiv(&c, div);
     pio_sm_init_(pio, sm, offset, &c);
     pio_sm_set_enabled(pio, sm, false); // enable when need
@@ -172,11 +173,10 @@ static void jd_tx_program_init(PIO pio, uint sm, uint offset, uint pin, uint bau
 REAL_TIME_FUNC
 static void jd_rx_arm_pin(PIO pio, uint sm, uint pin) {
 #ifdef DEBUG_PIN
-    // for debug pin 29
-    pio_sm_set_pins_with_mask_(pio, sm, 1u << 29, 1u << 29); // init high
-    pio_sm_set_pindirs_with_mask_(pio, sm, (0u << pin) | (1u << 29), (1u << pin) | (1u << 29));
-    pio_gpio_init_(pio, 29);
-    gpio_set_outover(29, GPIO_OVERRIDE_NORMAL);
+    pio_sm_set_pins_with_mask_(pio, sm, 1u << DEBUG_PIN, 1u << DEBUG_PIN); // init high
+    pio_sm_set_pindirs_with_mask_(pio, sm, (0u << pin) | (1u << DEBUG_PIN), (1u << pin) | (1u << DEBUG_PIN));
+    pio_gpio_init_(pio, DEBUG_PIN);
+    gpio_set_outover(DEBUG_PIN, GPIO_OVERRIDE_NORMAL);
 #else
     pio_sm_set_consecutive_pindirs_(pio, sm, pin, 1, false);
 #endif
@@ -194,9 +194,9 @@ static void jd_rx_program_init(PIO pio, uint sm, uint offset, uint pin, uint bau
     sm_config_set_in_shift(&c, true, true, 8);
     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_RX);
 #ifdef DEBUG_PIN
-    sm_config_set_sideset_pins(&c, 29);
+    sm_config_set_sideset_pins(&c, DEBUG_PIN);
 #endif
-    float div = (float)125000000 / (8 * baud);
+    float div = (float)clock_get_hz(clk_sys) / (8 * baud);
     sm_config_set_clkdiv(&c, div);
     pio_sm_init_(pio, sm, offset, &c);
     pio_sm_set_enabled(pio, sm, false); // enable when need

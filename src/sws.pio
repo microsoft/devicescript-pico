@@ -6,21 +6,23 @@
 .program jd_tx
 .side_set 1 opt
 
-  pull          side 1  [7] ;
-  set x, 7      side 0  [7] ;
-bitloop:
-  out pins, 1               ;
-  jmp x-- bitloop       [6] ;
+    pull       side 1 [7]  ; Assert stop bit, or stall with line in idle state
+    set x, 7   side 0 [7]  ; Preload bit counter, assert start bit for 8 clocks
+bitloop:                   ; This loop will run 8 times (8n1 UART)
+    out pins, 1            ; Shift 1 bit from OSR to the first OUT pin
+    jmp x-- bitloop   [6]  ; Each loop iteration is 8 cycles.
+
 
 .program jd_rx
 .side_set 1 opt
 start:
   wait 0 pin 0        ; Stall until start bit is asserted
   set x, 7 side 0 [7]    ; Preload bit counter, then delay until halfway through
-  nop [3]
+  nop [1]
 bitloop:              ; the first data bit (12 cycles incl wait, set).
-  in pins, 1          ; Shift data bit into ISR
-  jmp x-- bitloop [6] ; Loop 8 times, each loop iteration is 8 cycles
+  in pins, 1 side 1   ; Shift data bit into ISR
+  nop side 0
+  jmp x-- bitloop [5] ; Loop 8 times, each loop iteration is 8 cycles
   jmp pin good_stop side 1  ; Check stop bit (should be high)
   irq 1 side 0        ; Either a framing error or a break. Set a sticky flag,
   wait 1 pin 0        ; and wait for line to return to idle state.
