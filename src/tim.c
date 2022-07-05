@@ -15,8 +15,9 @@ static volatile uint32_t last_delay;
 static volatile uint32_t last_delay_now;
 
 REAL_TIME_FUNC
-static void tim_handler(uint num) {
-    (void)num;
+static void tim_handler(void) {
+    timer_hw->intr = 1u << ALARM_NUM;
+
     cb_t f = timer_cb;
     if (f) {
         target_disable_irq();
@@ -47,13 +48,17 @@ static inline uint harware_alarm_irq_number(uint alarm_num) {
 
 void tim_init() {
     uint irq_num = harware_alarm_irq_number(ALARM_NUM);
+
+    hardware_alarm_claim(ALARM_NUM);
+
+    irq_set_exclusive_handler(irq_num, tim_handler);
     ram_irq_set_priority(irq_num, IRQ_PRIORITY_TIM);
     ram_irq_set_enabled(irq_num, true);
 
-    hardware_alarm_claim(ALARM_NUM);
-    hardware_alarm_set_callback(ALARM_NUM, tim_handler);
+    hw_set_bits(&timer_hw->inte, 1u << ALARM_NUM);
 }
 
+REAL_TIME_FUNC
 void tim_set_timer(int delta, cb_t cb) {
     if (delta < 10)
         delta = 10;
@@ -63,17 +68,9 @@ void tim_set_timer(int delta, cb_t cb) {
 
     target_disable_irq();
     timer_cb = cb;
-
-    // this is very unlikely to do more than one iteration
-    absolute_time_t t;
-    last_set_iter = 0;
-    int0 = timer_hw->intr;
-    do {
-        update_us_since_boot(&t, tim_get_micros() + delta);
-        last_set_iter++;
-    } while (hardware_alarm_set_target(ALARM_NUM, t));
-    last_set_now = tim_get_micros();
-    int1 = timer_hw->intr;
+    timer_hw->alarm[ALARM_NUM] = (uint32_t)tim_get_micros() + delta;
+    // clear any pending IRQ
+    timer_hw->intr = 1u << ALARM_NUM; 
     irq_clear(harware_alarm_irq_number(ALARM_NUM));
     target_enable_irq();
 }
