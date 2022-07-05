@@ -5,7 +5,16 @@
 uint16_t tim_max_sleep;
 
 static cb_t timer_cb;
+static volatile uint32_t int0;
+static volatile uint32_t int1;
+static volatile uint32_t int2;
+static volatile uint32_t int3;
+static volatile uint32_t last_set_now;
+static volatile uint32_t last_set_iter;
+static volatile uint32_t last_delay;
+static volatile uint32_t last_delay_now;
 
+REAL_TIME_FUNC
 static void tim_handler(uint num) {
     (void)num;
     cb_t f = timer_cb;
@@ -13,15 +22,20 @@ static void tim_handler(uint num) {
         target_disable_irq();
         uint32_t tal = timer_hw->alarm[ALARM_NUM];
         uint32_t now = timer_hw->timerawl;
-        if (((tal - (now + 2)) >> 29) == 0) {
+        if (((tal - (now + 5)) >> 29) == 0) {
             // re-arm the alarm
-            timer_hw->alarm[ALARM_NUM] = tal;
-            DMESG("timer problem: al=%u now=%u", tal, now);
+            // timer_hw->alarm[ALARM_NUM] = tal;
+            last_delay = tal;
+            last_delay_now = now;
+            int2 = timer_hw->intr;
+            // DMESG("timer problem: al=%u now=%u", tal, now);
+            jd_panic();
             target_enable_irq();
             return;
         }
         target_enable_irq();
 
+        last_delay = 0;
         timer_cb = NULL;
         f();
     }
@@ -52,14 +66,36 @@ void tim_set_timer(int delta, cb_t cb) {
 
     // this is very unlikely to do more than one iteration
     absolute_time_t t;
+    last_set_iter = 0;
+    int0 = timer_hw->intr;
     do {
-        update_us_since_boot(&t, time_us_64() + delta);
+        update_us_since_boot(&t, tim_get_micros() + delta);
+        last_set_iter++;
     } while (hardware_alarm_set_target(ALARM_NUM, t));
+    last_set_now = tim_get_micros();
+    int1 = timer_hw->intr;
+    irq_clear(harware_alarm_irq_number(ALARM_NUM));
     target_enable_irq();
 }
 
+REAL_TIME_FUNC
 uint64_t tim_get_micros() {
-    return time_us_64();
+    // Need to make sure that the upper 32 bits of the timer
+    // don't change, so read that first
+    uint32_t hi = timer_hw->timerawh;
+    uint32_t lo;
+    do {
+        // Read the lower 32 bits
+        lo = timer_hw->timerawl;
+        // Now read the upper 32 bits again and
+        // check that it hasn't incremented. If it has loop around
+        // and read the lower 32 bits again to get an accurate value
+        uint32_t next_hi = timer_hw->timerawh;
+        if (hi == next_hi)
+            break;
+        hi = next_hi;
+    } while (true);
+    return ((uint64_t)hi << 32u) | lo;
 }
 
 REAL_TIME_FUNC
