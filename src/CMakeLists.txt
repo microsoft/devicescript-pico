@@ -8,6 +8,7 @@ add_executable(jacscript
         dma.c
         flash.c
         hf2.c
+        hid.c
         usb.c
         usb_descriptors.c
 

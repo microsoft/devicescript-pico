@@ -19,7 +19,8 @@ void usb_init(void);
 void usb_process(void);
 int usb_write(const void *buf, unsigned len);
 int usb_write_space_available(void);
-bool usb_is_connected();
+bool usb_is_connected(void);
+void hid_process(void);
 
 void reboot_to_uf2(void);
 void flush_dmesg(void);

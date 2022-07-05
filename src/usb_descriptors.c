@@ -5,11 +5,11 @@
 #define USB_VID 12346  // pretend to be ESP32 for website for now
 #define USB_PID 0x000a // Raspberry Pi Pico SDK CDC
 
-#define USB_DESC_LEN (TUD_CONFIG_DESC_LEN + TUD_CDC_DESC_LEN)
+#define USB_DESC_LEN (TUD_CONFIG_DESC_LEN + TUD_CDC_DESC_LEN + TUD_HID_DESC_LEN * HID_ITF_TOTAL)
 #define USB_MAX_POWER_MA 250
 
 #define USB_ITF_CDC 0
-#define USB_ITF_MAX 2 // CDC needs 2 interfaces
+#define USB_ITF_MAX (HID_ITF_OFF + HID_ITF_TOTAL)
 
 #define USB_CDC_EP_CMD 0x81
 #define USB_CDC_EP_OUT 0x02
@@ -17,11 +17,14 @@
 #define USB_CDC_CMD_MAX_SIZE 8
 #define USB_CDC_IN_OUT_MAX_SIZE 64
 
+#define HID_EPNUM_OFF 0x83 // 0x84 and 0x85 as well
+
 #define USB_STR_0 0x00
 #define USB_STR_MANUF 0x01
 #define USB_STR_PRODUCT 0x02
 #define USB_STR_SERIAL 0x03
 #define USB_STR_CDC 0x04
+#define USB_STR_HID 0x05 // 0x06, 0x07 as well
 
 static const tusb_desc_device_t desc_device = {
     .bLength = sizeof(tusb_desc_device_t),
@@ -40,10 +43,29 @@ static const tusb_desc_device_t desc_device = {
     .bNumConfigurations = 1,
 };
 
+static const uint8_t desc_hid_KEYBOARD[] = {TUD_HID_REPORT_DESC_KEYBOARD()};
+static const uint8_t desc_hid_MOUSE[] = {TUD_HID_REPORT_DESC_MOUSE()};
+static const uint8_t desc_hid_GAMEPAD[] = {TUD_HID_REPORT_DESC_GAMEPAD()};
+static const uint8_t *hid_descs[HID_ITF_TOTAL] = {
+    [HID_ITF_KEYBOARD] = desc_hid_KEYBOARD,
+    [HID_ITF_MOUSE] = desc_hid_MOUSE,
+    [HID_ITF_GAMEPAD] = desc_hid_GAMEPAD,
+};
+
+// Interface number, string index, protocol, report descriptor len, EP In address, size &
+// polling interval
+#define HID_DESC(id, proto)                                                                        \
+    TUD_HID_DESCRIPTOR(HID_ITF_OFF + HID_ITF_##id, USB_STR_HID + HID_ITF_##id, proto,              \
+                       sizeof(desc_hid_##id), HID_EPNUM_OFF + HID_ITF_##id,                        \
+                       CFG_TUD_HID_EP_BUFSIZE, 10)
+
 static const uint8_t desc_cfg[USB_DESC_LEN] = {
     TUD_CONFIG_DESCRIPTOR(1, USB_ITF_MAX, USB_STR_0, USB_DESC_LEN, 0, USB_MAX_POWER_MA),
     TUD_CDC_DESCRIPTOR(USB_ITF_CDC, USB_STR_CDC, USB_CDC_EP_CMD, USB_CDC_CMD_MAX_SIZE,
                        USB_CDC_EP_OUT, USB_CDC_EP_IN, USB_CDC_IN_OUT_MAX_SIZE),
+    HID_DESC(KEYBOARD, HID_ITF_PROTOCOL_KEYBOARD),
+    HID_DESC(MOUSE, HID_ITF_PROTOCOL_MOUSE),
+    HID_DESC(GAMEPAD, HID_ITF_PROTOCOL_NONE),
 };
 
 static char serial_str[2 + 2 * 8 + 1];
@@ -52,6 +74,9 @@ static const char *const string_descriptors[] = {
     [USB_STR_PRODUCT] = "RP2040",
     [USB_STR_SERIAL] = serial_str,
     [USB_STR_CDC] = "Jacdac CDC",
+    [USB_STR_HID + HID_ITF_KEYBOARD] = "Jacdac Keyboard",
+    [USB_STR_HID + HID_ITF_MOUSE] = "Jacdac Mouse",
+    [USB_STR_HID + HID_ITF_GAMEPAD] = "Jacdac Gamepad",
 };
 
 const uint8_t *tud_descriptor_device_cb(void) {
@@ -82,6 +107,8 @@ const uint16_t *tud_descriptor_string_cb(uint8_t index, __unused uint16_t langid
             return NULL;
         }
         const char *str = string_descriptors[index];
+        if (str == NULL)
+            return NULL;
         for (len = 0; len < (sizeof(desc_str) / 2) - 1 && str[len]; len++) {
             desc_str[1 + len] = str[len];
         }
@@ -91,4 +118,10 @@ const uint16_t *tud_descriptor_string_cb(uint8_t index, __unused uint16_t langid
     desc_str[0] = (uint16_t)((TUSB_DESC_STRING << 8) | (2 * len + 2));
 
     return desc_str;
+}
+
+uint8_t const *tud_hid_descriptor_report_cb(uint8_t instance) {
+    if (instance < HID_ITF_TOTAL)
+        return hid_descs[instance];
+    return NULL;
 }

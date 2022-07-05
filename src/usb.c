@@ -37,6 +37,7 @@ int usb_write(const void *buf, unsigned len) {
 
 void usb_process(void) {
     tud_task();
+    hid_process();
 
     if (!tud_cdc_connected()) {
         is_connected = 0;

@@ -4,13 +4,17 @@
 
 // #define CFG_TUSB_DEBUG           0
 
-#define CFG_TUD_HID 0
+
+enum { HID_ITF_KEYBOARD, HID_ITF_MOUSE, HID_ITF_GAMEPAD, HID_ITF_TOTAL };
+#define HID_ITF_OFF 2 // CDC needs 2
+
+#define CFG_TUD_HID 3 // HID_ITF_TOTAL
 #define CFG_TUD_CDC 1
 #define CFG_TUD_MSC 0
 #define CFG_TUD_MIDI 0
 #define CFG_TUD_VENDOR 0
 
-// #define CFG_TUD_HID_EP_BUFSIZE 16
+#define CFG_TUD_HID_EP_BUFSIZE 16
 
 #define CFG_TUD_CDC_RX_BUFSIZE  64
 #define CFG_TUD_CDC_TX_BUFSIZE  1024
