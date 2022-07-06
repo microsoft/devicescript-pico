@@ -25,6 +25,10 @@ void app_init_services(void) {
 #endif
     jd_role_manager_init();
     init_jacscript_manager();
+
+    hidkeyboard_init();
+    hidmouse_init();
+    hidjoystick_init();
 }
 
 int main() {
