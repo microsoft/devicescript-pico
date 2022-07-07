@@ -17,9 +17,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-        fetch-depth: 0
+
     - uses: actions/setup-node@v2-beta
       with:
           node-version: 'v12'
