@@ -59,6 +59,9 @@ boot: prep-build-gdb
 gdb: prep-build-gdb
 	arm-none-eabi-gdb --command=build/debug.gdb $(ELF)
 
+bump:
+	./jacdac-c/scripts/bump.sh
+
 # also keep ELF file for addr2line
 .PHONY: dist
 dist: all
