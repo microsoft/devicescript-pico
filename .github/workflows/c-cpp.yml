@@ -1,0 +1,49 @@
+name: GCC for ARM build
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - "v[0-9]*.*.*"
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    env:
+      GCC_VERSION: '10-2020-q4'
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+    - uses: actions/setup-node@v2-beta
+      with:
+          node-version: 'v12'
+
+    - name: Restore ARM GCC Cache
+      id: arm-gcc-cache
+      uses: actions/cache@v2
+      with:
+        path: arm-gcc
+        key:  ${{ runner.os }}-arm-gcc-${{ env.GCC_VERSION }}
+    - name: Install ARM GCC
+      if: steps.arm-gcc-cache.outputs.cache-hit != 'true'
+      uses: fiam/arm-none-eabi-gcc@v1
+      with:
+        release: ${{ env.GCC_VERSION }}
+        directory: arm-gcc
+    - name: set PATH
+      run: echo "${{ github.workspace }}/arm-gcc/bin" >> $GITHUB_PATH
+
+    - name: make
+      run: make dist
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+          files: dist/*
