@@ -61,9 +61,7 @@ void hid_process(void) {
 
     if (gamepad_report_dirty && tud_hid_n_ready(HID_ITF_GAMEPAD)) {
         gamepad_report_dirty = 0;
-        tud_hid_n_gamepad_report(HID_ITF_GAMEPAD, 0, gamepad_report.x, gamepad_report.y,
-                                 gamepad_report.z, gamepad_report.rz, gamepad_report.rx,
-                                 gamepad_report.ry, gamepad_report.hat, gamepad_report.buttons);
+        tud_hid_n_report(HID_ITF_GAMEPAD, 0, &gamepad_report, sizeof(gamepad_report));
     }
 }
 

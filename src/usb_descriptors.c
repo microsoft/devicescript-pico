@@ -45,7 +45,47 @@ static const tusb_desc_device_t desc_device = {
 
 static const uint8_t desc_hid_KEYBOARD[] = {TUD_HID_REPORT_DESC_KEYBOARD()};
 static const uint8_t desc_hid_MOUSE[] = {TUD_HID_REPORT_DESC_MOUSE()};
-static const uint8_t desc_hid_GAMEPAD[] = {TUD_HID_REPORT_DESC_GAMEPAD()};
+static const uint8_t desc_hid_GAMEPAD[] = {
+    // https://github.com/lancaster-university/codal-core/blob/master/source/drivers/HIDJoystick.cpp
+    0x05, 0x01, // USAGE_PAGE (Generic Desktop)
+    0x09, 0x05, // USAGE (Game Pad)
+    0xa1, 0x01, // COLLECTION (Application)
+    0x05, 0x02, // USAGE_PAGE (Simulation Controls)
+    0x09, 0xbb, // USAGE (Throttle)
+    0x15, 0x00, // LOGICAL_MINIMUM (0)
+    0x25, 0x1f, // LOGICAL_MAXIMUM (31)
+    0x75, 0x08, // REPORT_SIZE (8)
+    0x95, 0x01, // REPORT_COUNT (1)
+    0x81, 0x02, // INPUT (Data,Var,Abs)
+    0x05, 0x02, // USAGE_PAGE (Simulation Controls)
+    0x09, 0xb0, // USAGE (Rudder)
+    0x15, 0x00, // LOGICAL_MINIMUM (0)
+    0x25, 0x1f, // LOGICAL_MAXIMUM (31)
+    0x75, 0x08, // REPORT_SIZE (8)
+    0x95, 0x01, // REPORT_COUNT (1)
+    0x81, 0x02, // INPUT (Data,Var,Abs)
+    0x05, 0x01, // USAGE_PAGE (Generic Desktop)
+    0xa1, 0x00, // COLLECTION (Physical)
+    0x09, 0x30, // USAGE (X)
+    0x09, 0x31, // USAGE (Y)
+    0x09, 0x32, // USAGE (Z)
+    0x09, 0x35, // USAGE (Rz)
+    0x15, 0x81, // LOGICAL_MINIMUM (-127)
+    0x25, 0x7f, // LOGICAL_MAXIMUM (127)
+    0x75, 0x08, // REPORT_SIZE (8)
+    0x95, 0x04, // REPORT_COUNT (4)
+    0x81, 0x02, // INPUT (Data,Var,Abs)
+    0x05, 0x09, // USAGE_PAGE (Button)
+    0x19, 0x01, // USAGE_MINIMUM (Button 1)
+    0x29, 0x10, // USAGE_MAXIMUM (Button 16)
+    0x15, 0x00, // LOGICAL_MINIMUM (0)
+    0x25, 0x01, // LOGICAL_MAXIMUM (1)
+    0x75, 0x01, // REPORT_SIZE (1)
+    0x95, 0x10, // REPORT_COUNT (16)
+    0x81, 0x02, // INPUT (Data,Var,Abs)
+    0xc0,       // END_COLLECTION
+    0xc0        // END_COLLECTION
+};
 static const uint8_t *hid_descs[HID_ITF_TOTAL] = {
     [HID_ITF_KEYBOARD] = desc_hid_KEYBOARD,
     [HID_ITF_MOUSE] = desc_hid_MOUSE,
@@ -63,9 +103,9 @@ static const uint8_t desc_cfg[USB_DESC_LEN] = {
     TUD_CONFIG_DESCRIPTOR(1, USB_ITF_MAX, USB_STR_0, USB_DESC_LEN, 0, USB_MAX_POWER_MA),
     TUD_CDC_DESCRIPTOR(USB_ITF_CDC, USB_STR_CDC, USB_CDC_EP_CMD, USB_CDC_CMD_MAX_SIZE,
                        USB_CDC_EP_OUT, USB_CDC_EP_IN, USB_CDC_IN_OUT_MAX_SIZE),
+    HID_DESC(GAMEPAD, HID_ITF_PROTOCOL_NONE),
     HID_DESC(KEYBOARD, HID_ITF_PROTOCOL_KEYBOARD),
     HID_DESC(MOUSE, HID_ITF_PROTOCOL_MOUSE),
-    HID_DESC(GAMEPAD, HID_ITF_PROTOCOL_NONE),
 };
 
 static char serial_str[2 + 2 * 8 + 1];
