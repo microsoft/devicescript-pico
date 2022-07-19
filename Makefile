@@ -30,6 +30,8 @@ build/config.cmake: Makefile Makefile.user
 	mkdir -p build
 	echo "add_compile_options($(COMPILE_OPTIONS))" > $@
 
+FW_VERSION = $(shell sh jacdac-c/scripts/git-version.sh)
+
 refresh-version:
 	@mkdir -p build
 	echo 'const char app_fw_version[] = "v$(FW_VERSION)";' > build/version-tmp.c

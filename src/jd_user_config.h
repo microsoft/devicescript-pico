@@ -33,11 +33,10 @@
 // this is min. erase size
 #define JD_FLASH_PAGE_SIZE 4096
 
-void hf2_send_frame(const void *frame);
-#define JD_BRIDGE_SEND hf2_send_frame
-
 // probably not so useful on brains...
 #define JD_CONFIG_WATCHDOG 0
+
+#define JD_USB_BRIDGE 1
 
 #define JD_SEND_FRAME_SIZE 1024
 

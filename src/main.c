@@ -38,9 +38,7 @@ int main() {
     while (true) {
         jd_process_everything();
         usb_process();
-#if 0
         if (!jd_rx_has_frame())
-            target_wait_us(10000);
-#endif
+            __asm volatile("wfe");
     }
 }

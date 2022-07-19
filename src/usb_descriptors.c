@@ -1,9 +1,9 @@
 #include "jdpico.h"
 #include "tusb.h"
 
-// #define USB_VID 0x2E8A // Raspberry Pi
-#define USB_VID 12346  // pretend to be ESP32 for website for now
-#define USB_PID 0x000a // Raspberry Pi Pico SDK CDC
+#define USB_VID 0x2E8A // Raspberry Pi
+// #define USB_PID 0x000a // Raspberry Pi Pico SDK CDC
+#define USB_PID 0x420a // Raspberry Pi Pico SDK CDC
 
 #define USB_DESC_LEN (TUD_CONFIG_DESC_LEN + TUD_CDC_DESC_LEN + TUD_HID_DESC_LEN * HID_ITF_TOTAL)
 #define USB_MAX_POWER_MA 500
