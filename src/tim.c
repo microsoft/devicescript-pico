@@ -25,12 +25,12 @@ static void tim_handler(void) {
         uint32_t now = timer_hw->timerawl;
         if (((tal - (now + 5)) >> 29) == 0) {
             // re-arm the alarm
-            // timer_hw->alarm[ALARM_NUM] = tal;
+            timer_hw->alarm[ALARM_NUM] = tal;
             last_delay = tal;
             last_delay_now = now;
             int2 = timer_hw->intr;
-            // DMESG("timer problem: al=%u now=%u", tal, now);
-            jd_panic();
+            DMESG("timer problem: al=%u now=%u", tal, now);
+            // jd_panic();
             target_enable_irq();
             return;
         }
