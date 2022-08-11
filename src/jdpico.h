@@ -44,6 +44,5 @@ void exti_enable(uint8_t pin);
 
 #define IRQ_PRIORITY_DEFAULT PICO_DEFAULT_IRQ_PRIORITY
 #define IRQ_PRIORITY_TIM (2 << 6)
-#define IRQ_PRIORITY_DMA (1 << 6)
 #define IRQ_PRIORITY_EXTI (0 << 6)
 #define IRQ_PRIORITY_UART (0 << 6)

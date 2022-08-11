@@ -9,6 +9,7 @@ uint32_t app_get_device_class(void) {
     return DEV_CLASS;
 }
 
+#if 1
 #ifdef PIN_PWR_EN
 static power_config_t pwr_cfg = {
     .pin_fault = PIN_PWR_FAULT, // active low
@@ -16,6 +17,15 @@ static power_config_t pwr_cfg = {
     .pin_pulse = NO_PIN,
     .en_active_high = 2,
     .fault_ignore_ms = 100, // there 4.7uF cap that takes time to charge
+};
+#endif
+#else
+static power_config_t pwr_cfg = {
+    .pin_fault = 2,
+    .pin_en = 6,
+    .pin_pulse = NO_PIN,
+    .en_active_high = 3,
+    .fault_ignore_ms = 1000,
 };
 #endif
 
