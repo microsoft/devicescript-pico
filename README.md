@@ -18,6 +18,10 @@ and then "CONNECT SERIAL" (not "CONNECT USB").
 Then head to "Device Dashboard" (Jacdac "logo" (connector icon) next to "CONNECT" button).
 You should see widgets for power service, Jacscript and HID services.
 
+## TODO
+
+* PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a

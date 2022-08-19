@@ -2,35 +2,30 @@
 
 uint32_t now;
 
+#if BRAIN_ID == 59
 const char app_dev_class_name[] = "RP2040 Jacscript 59 v0.1";
 #define DEV_CLASS 0x35a678a3
+#endif
+
+#if BRAIN_ID == 124
+const char app_dev_class_name[] = "RP2040 Jacscript 124 v0.1";
+#define DEV_CLASS 0x3875e80d
+#endif
 
 uint32_t app_get_device_class(void) {
     return DEV_CLASS;
 }
 
-#if 1
-#ifdef PIN_PWR_EN
-static power_config_t pwr_cfg = {
-    .pin_fault = PIN_PWR_FAULT, // active low
-    .pin_en = PIN_PWR_EN,
-    .pin_pulse = NO_PIN,
-    .en_active_high = 2,
-    .fault_ignore_ms = 100, // there 4.7uF cap that takes time to charge
-};
-#endif
-#else
-static power_config_t pwr_cfg = {
-    .pin_fault = 2,
-    .pin_en = 6,
-    .pin_pulse = NO_PIN,
-    .en_active_high = 3,
-    .fault_ignore_ms = 1000,
-};
+#ifdef PWR_CFG
+static power_config_t pwr_cfg = {PWR_CFG};
 #endif
 
 void app_init_services(void) {
-#ifdef PIN_PWR_EN
+#ifdef PWR_CFG
+#ifdef PIN_PWR_N_ILIM_HI
+    pin_set(PIN_PWR_N_ILIM_HI, 0);
+    pin_setup_output(PIN_PWR_N_ILIM_HI);
+#endif
     power_init(&pwr_cfg);
 #endif
     jd_role_manager_init();
