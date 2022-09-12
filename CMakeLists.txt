@@ -21,6 +21,7 @@ add_compile_options(-Wall
     -Wno-unused-function
     -Wno-maybe-uninitialized
     -Wno-zero-length-bounds
+    -ffunction-sections
 )
 
 include(build/config.cmake)
@@ -28,3 +29,7 @@ include(build/config.cmake)
 pico_sdk_init()
 
 add_subdirectory(src)
+
+# location of jd_user_config.h
+set(JACDAC_USER_CONFIG_DIR "../src")
+add_subdirectory(jacdac-c)
