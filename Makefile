@@ -52,9 +52,7 @@ prep-build-gdb:
 	echo "attach 1" >> $(BUILD)/debug.gdb
 
 boot: prep-build-gdb
-	echo 'set $$pc=0x25b5' >> $(BUILD)/debug.gdb
-	echo 'set $$r0=0' >> $(BUILD)/debug.gdb
-	echo 'set $$r1=0' >> $(BUILD)/debug.gdb
+	echo 'mon reset_usb_boot' >> $(BUILD)/debug.gdb
 	echo "quit" >> $(BUILD)/debug.gdb
 	arm-none-eabi-gdb --command=$(BUILD)/debug.gdb $(ELF) < /dev/null
 	sleep 2
@@ -69,8 +67,8 @@ bump:
 .PHONY: dist
 sub-dist: all
 	mkdir -p dist
-	cp $(BUILD)/src/jacscript.uf2 dist/jacscript-$(BRAIN_ID).uf2
-	cp $(BUILD)/src/jacscript.elf dist/jacscript-$(BRAIN_ID).elf
+	cp $(BUILD)/src/jacscript.uf2 dist/jacscript-rp2040-msr$(BRAIN_ID).uf2
+	cp $(BUILD)/src/jacscript.elf dist/jacscript-rp2040-msr$(BRAIN_ID).elf
 
 dist:
 	$(MAKE) BRAIN_ID=59 sub-dist
