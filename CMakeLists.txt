@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-set(PICO_SDK_PATH ../pico-sdk)
+set(PICO_SDK_PATH ../../pico-sdk)
 
 # Pull in SDK (must be before project)
 include(pico-sdk/external/pico_sdk_import.cmake)
@@ -24,7 +24,7 @@ add_compile_options(-Wall
     -ffunction-sections
 )
 
-include(build/config.cmake)
+include(${CMAKE_BINARY_DIR}/config.cmake)
 
 pico_sdk_init()
 

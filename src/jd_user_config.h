@@ -5,8 +5,9 @@
 
 #include "dmesg.h"
 
-// #define BRAIN_ID 124
-#define BRAIN_ID 59
+#ifndef BRAIN_ID
+#error "define BRAIN_ID (124 or 59)"
+#endif
 
 #define JD_LOG DMESG
 #define JD_WR_OVERHEAD 28

@@ -11,7 +11,7 @@ add_executable(jacscript
         usb.c
         usb_descriptors.c
 
-        "../build/version.c"
+        ${CMAKE_BINARY_DIR}/version.c
 )
 
 pico_generate_pio_header(jacscript ${CMAKE_CURRENT_LIST_DIR}/sws.pio)
