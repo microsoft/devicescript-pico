@@ -54,7 +54,7 @@ void flash_erase(void *page_addr) {
     target_enable_irq();
 }
 
-void init_jacscript_manager(void) {
+void init_devicescript_manager(void) {
     cfg.max_program_size = MAX_PROG_SIZE * 1024;
     cfg.program_base = (void *)(XIP_BASE + STORAGE_OFFSET);
     JD_ASSERT((STORAGE_OFFSET & (JD_FLASH_PAGE_SIZE - 1)) == 0);

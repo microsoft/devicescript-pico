@@ -1,4 +1,4 @@
-# Jacdac+Jacscript for RP2040
+# Jacdac+DeviceScript for RP2040
 
 To build just run `make` - this will clone submodules and invoke `cmake` as appropriate.
 Do not clone with `--recursive` unless you want to wait a long time - just run `make`.
@@ -7,7 +7,7 @@ You will need ARM GCC and node.js installed as well - some of our
 [instructions for STM32 build](https://github.com/microsoft/jacdac-stm32x0/blob/main/README.md#setup)
 may apply.
 
-Once you build, copy `build/src/jacscript.uf2` to the RPI-RP2 drive.
+Once you build, copy `build/src/devsrunner.uf2` to the RPI-RP2 drive.
 
 Debugging is set up for Black Magic Probe. 
 You can convert a [$3 Bluepill board into Black Magic Probe](https://github.com/mmoskal/blackmagic-bluepill).
@@ -16,7 +16,7 @@ Run `make gdb` to run GDB.
 One you have the firmware running, head to https://aka.ms/jacdac and press "CONNECT" in top-right corner,
 and then "CONNECT SERIAL" (not "CONNECT USB").
 Then head to "Device Dashboard" (Jacdac "logo" (connector icon) next to "CONNECT" button).
-You should see widgets for power service, Jacscript and HID services.
+You should see widgets for power service, DeviceScript and HID services.
 
 ## TODO
 

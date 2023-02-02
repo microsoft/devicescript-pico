@@ -1,4 +1,4 @@
-add_executable(jacscript
+add_executable(devsrunner
         main.c
         dmesg.c
         platform.c
@@ -14,7 +14,7 @@ add_executable(jacscript
         ${CMAKE_BINARY_DIR}/version.c
 )
 
-pico_generate_pio_header(jacscript ${CMAKE_CURRENT_LIST_DIR}/sws.pio)
+pico_generate_pio_header(devsrunner ${CMAKE_CURRENT_LIST_DIR}/sws.pio)
 
 include_directories(AFTER
         "."
@@ -22,7 +22,7 @@ include_directories(AFTER
 
 
 # pull in common dependencies
-target_link_libraries(jacscript
+target_link_libraries(devsrunner
         jacdac
         devicescript
         pico_stdlib
@@ -36,4 +36,4 @@ target_link_libraries(jacscript
 )
 
 # create map/bin/hex file etc.
-pico_add_extra_outputs(jacscript)
+pico_add_extra_outputs(devsrunner)

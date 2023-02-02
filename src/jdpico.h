@@ -8,7 +8,7 @@
 #include "pico/stdlib.h"
 #include "RP2040.h"
 
-void init_jacscript_manager(void);
+void init_devicescript_manager(void);
 
 void hf2_init(void);
 int hf2_send_serial(const void *data, int size, int isError);

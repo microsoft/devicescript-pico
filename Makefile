@@ -5,7 +5,9 @@ BRAIN_ID ?= 59
 BUILD = build/$(BRAIN_ID)
 JDC = devicescript/runtime/jacdac-c
 
-ELF = $(BUILD)/src/jacscript.elf
+EXE = devsrunner
+ELF = $(BUILD)/src/$(EXE).elf
+UF2 = $(BUILD)/src/$(EXE).uf2
 
 all: submodules refresh-version
 	cd $(BUILD) && cmake ../..
@@ -15,7 +17,7 @@ r: flash
 f: flash
 
 flash: all boot
-	cp $(BUILD)/src/jacscript.uf2 /Volumes/RPI-RP2
+	cp $(UF2) /Volumes/RPI-RP2
 
 submodules: pico-sdk/lib/tinyusb/README.rst $(JDC)/jacdac/README.md $(BUILD)/config.cmake
 
@@ -68,8 +70,8 @@ bump:
 .PHONY: dist
 sub-dist: all
 	mkdir -p dist
-	cp $(BUILD)/src/jacscript.uf2 dist/jacscript-rp2040-msr$(BRAIN_ID).uf2
-	cp $(BUILD)/src/jacscript.elf dist/jacscript-rp2040-msr$(BRAIN_ID).elf
+	cp $(UF2) dist/devicescript-rp2040-msr$(BRAIN_ID).uf2
+	cp $(ELF) dist/devicescript-rp2040-msr$(BRAIN_ID).elf
 
 dist:
 	$(MAKE) BRAIN_ID=59 sub-dist
@@ -77,7 +79,7 @@ dist:
 	ls -l dist/
 
 st:
-	node $(JDC)/scripts/map-file-stats.js $(BUILD)/src/jacscript.elf.map
+	node $(JDC)/scripts/map-file-stats.js $(ELF).map
 
 stf:
-	node $(JDC)/scripts/map-file-stats.js $(BUILD)/src/jacscript.elf.map -fun
+	node $(JDC)/scripts/map-file-stats.js $(ELF).map -fun

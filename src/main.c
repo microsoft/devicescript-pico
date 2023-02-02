@@ -3,12 +3,12 @@
 uint32_t now;
 
 #if BRAIN_ID == 59
-const char app_dev_class_name[] = "RP2040 Jacscript 59 v0.1";
+const char app_dev_class_name[] = "RP2040 DeviceScript 59 v0.1";
 #define DEV_CLASS 0x35a678a3
 #endif
 
 #if BRAIN_ID == 124
-const char app_dev_class_name[] = "RP2040 Jacscript 124 v0.1";
+const char app_dev_class_name[] = "RP2040 DeviceScript 124 v0.1";
 #define DEV_CLASS 0x3875e80d
 #endif
 
@@ -29,7 +29,7 @@ void app_init_services(void) {
     power_init(&pwr_cfg);
 #endif
     jd_role_manager_init();
-    init_jacscript_manager();
+    init_devicescript_manager();
 
     hidkeyboard_init();
     hidmouse_init();
