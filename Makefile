@@ -75,3 +75,9 @@ dist:
 	$(MAKE) BRAIN_ID=59 sub-dist
 	$(MAKE) BRAIN_ID=124 sub-dist
 	ls -l dist/
+
+st:
+	node $(JDC)/scripts/map-file-stats.js $(BUILD)/src/jacscript.elf.map
+
+stf:
+	node $(JDC)/scripts/map-file-stats.js $(BUILD)/src/jacscript.elf.map -fun
