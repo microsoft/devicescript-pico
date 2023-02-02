@@ -20,14 +20,16 @@ static void flash_program_page(uintptr_t addr, const uint8_t *src, uint32_t len)
         JD_ASSERT(dst[dp + i] == 0xff);
         flash_page_buf[dp + i] = src[i];
     }
+    target_disable_irq();
     flash_range_program(addr & ~PAGE_MASK, flash_page_buf, FLASH_PAGE_SIZE);
+    target_enable_irq();
 }
 
 void flash_program(void *dst, const void *src, uint32_t len) {
     JD_ASSERT(cfg.program_base != NULL);
     ptrdiff_t diff = (uintptr_t)dst - XIP_BASE - STORAGE_OFFSET;
     JD_ASSERT(0 <= diff && diff <= cfg.max_program_size - JD_FLASH_PAGE_SIZE);
-    JD_ASSERT((diff & (JD_FLASH_PAGE_SIZE - 1)) == 0);
+    JD_ASSERT((diff & (8 - 1)) == 0);
 
     uintptr_t off = diff + STORAGE_OFFSET;
     while (len > 0) {
@@ -47,7 +49,9 @@ void flash_erase(void *page_addr) {
     JD_ASSERT(0 <= diff && diff <= cfg.max_program_size - JD_FLASH_PAGE_SIZE);
     JD_ASSERT((diff & (JD_FLASH_PAGE_SIZE - 1)) == 0);
 
+    target_disable_irq();
     flash_range_erase(diff + STORAGE_OFFSET, JD_FLASH_PAGE_SIZE);
+    target_enable_irq();
 }
 
 void init_jacscript_manager(void) {
@@ -55,6 +59,7 @@ void init_jacscript_manager(void) {
     cfg.program_base = (void *)(XIP_BASE + STORAGE_OFFSET);
     JD_ASSERT((STORAGE_OFFSET & (JD_FLASH_PAGE_SIZE - 1)) == 0);
     devsmgr_init(&cfg);
+    devsdbg_init();
 }
 
 void flash_sync(void) {}
