@@ -1,7 +1,8 @@
 _IGNORE0 := $(shell test -f Makefile.user || cp sample-Makefile.user Makefile.user)
 
 include Makefile.user
-BRAIN_ID ?= 59
+BRAIN_ID ?= PICO_W
+
 BUILD = build/$(BRAIN_ID)
 JDC = devicescript/runtime/jacdac-c
 
@@ -9,8 +10,12 @@ EXE = devsrunner
 ELF = $(BUILD)/src/$(EXE).elf
 UF2 = $(BUILD)/src/$(EXE).uf2
 
+ifeq ($(BRAIN_ID),PICO_W)
+CMAKE_OPTIONS += -DPICO_BOARD=pico_w
+endif
+
 all: submodules refresh-version
-	cd $(BUILD) && cmake ../..
+	cd $(BUILD) && cmake ../.. $(CMAKE_OPTIONS)
 	$(MAKE) -j16 -C $(BUILD)
 
 r: flash
@@ -33,7 +38,7 @@ pico-sdk/lib/tinyusb/README.rst:
 
 $(BUILD)/config.cmake: Makefile Makefile.user
 	mkdir -p $(BUILD)
-	echo "add_compile_options($(COMPILE_OPTIONS) -DBRAIN_ID=$(BRAIN_ID))" > $@
+	echo "add_compile_options($(COMPILE_OPTIONS) -DBRAIN_ID=BRAIN_ID_$(BRAIN_ID))" > $@
 
 FW_VERSION = $(shell sh $(JDC)/scripts/git-version.sh)
 
@@ -70,12 +75,12 @@ bump:
 .PHONY: dist
 sub-dist: all
 	mkdir -p dist
-	cp $(UF2) dist/devicescript-rp2040-msr$(BRAIN_ID).uf2
-	cp $(ELF) dist/devicescript-rp2040-msr$(BRAIN_ID).elf
+	cp $(UF2) dist/devicescript-rp2040-$(BRAIN_ID).uf2
+	cp $(ELF) dist/devicescript-rp2040-$(BRAIN_ID).elf
 
 dist:
-	$(MAKE) BRAIN_ID=59 sub-dist
-	$(MAKE) BRAIN_ID=124 sub-dist
+	$(MAKE) BRAIN_ID=MSR59 sub-dist
+	$(MAKE) BRAIN_ID=MSR124 sub-dist
 	ls -l dist/
 
 st:

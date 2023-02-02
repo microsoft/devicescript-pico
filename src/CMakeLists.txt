@@ -1,16 +1,7 @@
-add_executable(devsrunner
-        main.c
-        dmesg.c
-        platform.c
-        pins.c
-        tim.c
-        uart.c
-        dma.c
-        flash.c
-        hid.c
-        usb.c
-        usb_descriptors.c
+file(GLOB RUNNER_FILES *.c)
 
+add_executable(devsrunner
+        ${RUNNER_FILES}
         ${CMAKE_BINARY_DIR}/version.c
 )
 
@@ -19,7 +10,6 @@ pico_generate_pio_header(devsrunner ${CMAKE_CURRENT_LIST_DIR}/sws.pio)
 include_directories(AFTER
         "."
 )
-
 
 # pull in common dependencies
 target_link_libraries(devsrunner
@@ -34,6 +24,10 @@ target_link_libraries(devsrunner
         cmsis_core
         tinyusb_device
 )
+
+if(PICO_CYW43_SUPPORTED)
+        target_link_libraries(devsrunner pico_cyw43_arch_lwip_poll)
+endif()
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(devsrunner)

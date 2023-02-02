@@ -2,15 +2,7 @@
 
 uint32_t now;
 
-#if BRAIN_ID == 59
-const char app_dev_class_name[] = "RP2040 DeviceScript 59 v0.1";
-#define DEV_CLASS 0x35a678a3
-#endif
-
-#if BRAIN_ID == 124
-const char app_dev_class_name[] = "RP2040 DeviceScript 124 v0.1";
-#define DEV_CLASS 0x3875e80d
-#endif
+const char app_dev_class_name[] = DEV_CLASS_NAME;
 
 uint32_t app_get_device_class(void) {
     return DEV_CLASS;
@@ -30,6 +22,10 @@ void app_init_services(void) {
 #endif
     jd_role_manager_init();
     init_devicescript_manager();
+
+#if WIFI_SUPPORTED
+    wifi_init();
+#endif
 
     hidkeyboard_init();
     hidmouse_init();

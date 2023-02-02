@@ -10,22 +10,12 @@
 
 void init_devicescript_manager(void);
 
-void hf2_init(void);
-int hf2_send_serial(const void *data, int size, int isError);
-void hf2_send_frame(const void *ptr);
-void hf2_recv(uint8_t buf[64]);
-
 void usb_init(void);
 void usb_process(void);
-int usb_write(const void *buf, unsigned len);
-int usb_write_space_available(void);
 bool usb_is_connected(void);
 void hid_process(void);
 
 void reboot_to_uf2(void);
-void flush_dmesg(void);
-
-void init_sdcard(void);
 
 void platform_init(void);
 
