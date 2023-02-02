@@ -31,5 +31,6 @@ pico_sdk_init()
 add_subdirectory(src)
 
 # location of jd_user_config.h
-set(JACDAC_USER_CONFIG_DIR "../src")
-add_subdirectory(jacdac-c)
+set(JACDAC_USER_CONFIG_DIR "../../../src")
+add_subdirectory(devicescript/runtime/jacdac-c)
+add_subdirectory(devicescript/runtime/devicescript)

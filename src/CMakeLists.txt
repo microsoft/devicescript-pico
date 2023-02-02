@@ -24,6 +24,7 @@ include_directories(AFTER
 # pull in common dependencies
 target_link_libraries(jacscript
         jacdac
+        devicescript
         pico_stdlib
         pico_unique_id
         hardware_pwm

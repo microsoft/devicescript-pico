@@ -22,7 +22,6 @@ static uint32_t hw_random(void) {
 }
 
 void platform_init(void) {
-    DMESG("JD init, %s", app_fw_version);
     uint32_t r = hw_random();
     DMESG("rand %x", r);
     jd_seed_random(r);

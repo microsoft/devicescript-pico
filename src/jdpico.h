@@ -1,7 +1,7 @@
 #pragma once
 
 #include "jd_client.h"
-#include "jacscript/jacscript.h"
+#include "devicescript.h"
 #include "services/jd_services.h"
 #include "services/interfaces/jd_pins.h"
 

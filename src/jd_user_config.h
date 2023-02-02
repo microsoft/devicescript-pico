@@ -55,4 +55,6 @@
 
 #define JD_SEND_FRAME_SIZE 1024
 
+#define JD_LSTORE 0
+
 #endif

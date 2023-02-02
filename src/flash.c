@@ -1,7 +1,7 @@
 #include "jdpico.h"
 #include "hardware/flash.h"
 
-static jacscriptmgr_cfg_t cfg;
+static devsmgr_cfg_t cfg;
 static uint8_t flash_page_buf[FLASH_PAGE_SIZE];
 
 #define SPI_FLASH_SIZE 1024 // k
@@ -54,7 +54,7 @@ void init_jacscript_manager(void) {
     cfg.max_program_size = MAX_PROG_SIZE * 1024;
     cfg.program_base = (void *)(XIP_BASE + STORAGE_OFFSET);
     JD_ASSERT((STORAGE_OFFSET & (JD_FLASH_PAGE_SIZE - 1)) == 0);
-    jacscriptmgr_init(&cfg);
+    devsmgr_init(&cfg);
 }
 
 void flash_sync(void) {}

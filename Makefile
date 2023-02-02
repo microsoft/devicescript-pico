@@ -3,6 +3,7 @@ _IGNORE0 := $(shell test -f Makefile.user || cp sample-Makefile.user Makefile.us
 include Makefile.user
 BRAIN_ID ?= 59
 BUILD = build/$(BRAIN_ID)
+JDC = devicescript/runtime/jacdac-c
 
 ELF = $(BUILD)/src/jacscript.elf
 
@@ -16,13 +17,13 @@ f: flash
 flash: all boot
 	cp $(BUILD)/src/jacscript.uf2 /Volumes/RPI-RP2
 
-submodules: pico-sdk/lib/tinyusb/README.rst jacdac-c/jacdac/README.md $(BUILD)/config.cmake
+submodules: pico-sdk/lib/tinyusb/README.rst $(JDC)/jacdac/README.md $(BUILD)/config.cmake
 
 # don't do --recursive - we don't want all tinyusb submodules
 
-jacdac-c/jacdac/README.md:
+$(JDC)/jacdac/README.md:
 	git submodule update --init
-	cd jacdac-c && git submodule update --init
+	cd devicescript && git submodule update --init --recursive
 
 pico-sdk/lib/tinyusb/README.rst:
 	git submodule update --init
@@ -32,7 +33,7 @@ $(BUILD)/config.cmake: Makefile Makefile.user
 	mkdir -p $(BUILD)
 	echo "add_compile_options($(COMPILE_OPTIONS) -DBRAIN_ID=$(BRAIN_ID))" > $@
 
-FW_VERSION = $(shell sh jacdac-c/scripts/git-version.sh)
+FW_VERSION = $(shell sh $(JDC)/scripts/git-version.sh)
 
 refresh-version:
 	@mkdir -p $(BUILD)
@@ -61,7 +62,7 @@ gdb: prep-build-gdb
 	arm-none-eabi-gdb --command=$(BUILD)/debug.gdb $(ELF)
 
 bump:
-	./jacdac-c/scripts/bump.sh
+	./$(JDC)/scripts/bump.sh
 
 # also keep ELF file for addr2line
 .PHONY: dist
