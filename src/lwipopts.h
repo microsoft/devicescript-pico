@@ -1,11 +1,5 @@
 #pragma once
 
-#if PICO_CYW43_ARCH_POLL
-// OK
-#else
-#error "need poll"
-#endif
-
 // copied from https://github.com/raspberrypi/pico-examples/blob/master/pico_w/lwipopts_examples_common.h
 // (see https://www.nongnu.org/lwip/2_1_x/group__lwip__opts.html for details)
 

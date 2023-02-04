@@ -4,23 +4,17 @@
 
 #include "pico/cyw43_arch.h"
 
-#define LOG_TAG "cyw43"
-#include "devs_logging.h"
+// #define LOG_TAG "cyw43"
+// #include "devs_logging.h"
+
+#define LOG(msg, ...) printf(msg "\n", ##__VA_ARGS__)
 
 static jd_wifi_results_t *scan_res;
 static uint16_t scan_ptr, scan_size;
+static bool inited, in_scan;
 
 static int scan_result(void *env, const cyw43_ev_scan_result_t *result) {
-    LOG("scan result");
     if (result) {
-        if (scan_ptr >= scan_size) {
-            scan_size = scan_size * 2 + 5;
-            jd_wifi_results_t *tmp = jd_alloc(sizeof(jd_wifi_results_t) * scan_size);
-            memcpy(tmp, scan_res, scan_ptr);
-            jd_free(scan_res);
-            scan_res = tmp;
-        }
-
         jd_wifi_results_t ent = {
             .rssi = result->rssi,
             .channel = result->channel,
@@ -28,14 +22,30 @@ static int scan_result(void *env, const cyw43_ev_scan_result_t *result) {
         };
         memcpy(ent.ssid, result->ssid, result->ssid_len);
         memcpy(ent.bssid, result->bssid, 6);
-        scan_res[scan_ptr++] = ent;
-    }
 
-    if (!cyw43_wifi_scan_active(&cyw43_state)) {
-        jd_wifi_scan_done_cb(scan_res, scan_ptr);
-        scan_res = NULL;
-        scan_ptr = 0;
-        scan_size = 0;
+        bool found = false;
+
+        for (unsigned i = 0; i < scan_ptr; ++i) {
+            if (memcmp(ent.bssid, scan_res[i].bssid, 6) == 0) {
+                scan_res[i] = ent;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            if (scan_ptr >= scan_size) {
+                scan_size = scan_size * 2 + 5;
+                jd_wifi_results_t *tmp = jd_alloc(sizeof(jd_wifi_results_t) * scan_size);
+                memcpy(tmp, scan_res, scan_ptr);
+                jd_free(scan_res);
+                scan_res = tmp;
+            }
+
+            scan_res[scan_ptr++] = ent;
+        }
+
+        // LOG("ssid: %s %d %d", ent.ssid, ent.rssi, ent.channel);
     }
 
     return 0;
@@ -45,6 +55,7 @@ int jd_wifi_start_scan(void) {
     if (cyw43_wifi_scan_active(&cyw43_state))
         return -10;
 
+    in_scan = true;
     cyw43_wifi_scan_options_t scan_options = {0};
     return cyw43_wifi_scan(&cyw43_state, &scan_options, NULL, scan_result);
 }
@@ -106,16 +117,29 @@ int jd_wifi_rssi(void) {
 
 int jd_wifi_init(uint8_t mac_out[6]) {
     LOG("start init");
-    if (cyw43_arch_init())
+    if (cyw43_arch_init()) {
+        DMESG("! can't init wifi");
         return -1;
+    }
     cyw43_arch_enable_sta_mode();
     memcpy(mac_out, cyw43_state.mac, 6);
     LOG("init ok; mac: %-s", jd_to_hex_a(mac_out, 6));
+    // cyw43_state.trace_flags = ~0;
+    inited = true;
     return 0;
 }
 
 void jd_tcpsock_process(void) {
     cyw43_arch_poll();
+
+    if (in_scan && !cyw43_wifi_scan_active(&cyw43_state)) {
+        in_scan = false;
+        LOG("scan done!");
+        jd_wifi_scan_done_cb(scan_res, scan_ptr);
+        scan_res = NULL;
+        scan_ptr = 0;
+        scan_size = 0;
+    }
 
     static int prev_status = -1000;
     int new_status = cyw43_tcpip_link_status(&cyw43_state, CYW43_ITF_STA);
@@ -133,5 +157,25 @@ void jd_tcpsock_process(void) {
 }
 
 void jd_tcpsock_init(void) {}
+
+void pico_w_set_led(uint8_t r, uint8_t g, uint8_t b) {
+    if (!inited)
+        return;
+
+    static bool is_on;
+    bool should_be_on = r > 0 || g > 0 || b > 0;
+    if (is_on != should_be_on) {
+        is_on = should_be_on;
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, is_on);
+    }
+}
+
+void jd_crypto_get_random(uint8_t *buf, unsigned size) {
+    JD_ASSERT(!(size & 3));
+    for (unsigned i = 0; i < size; i += 4) {
+        uint32_t v = hw_random();
+        memcpy(buf + i, &v, 4);
+    }
+}
 
 #endif

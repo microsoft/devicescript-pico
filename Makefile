@@ -22,6 +22,7 @@ r: flash
 f: flash
 
 flash: all boot
+	sleep 2
 	cp $(UF2) /Volumes/RPI-RP2
 
 submodules: pico-sdk/lib/tinyusb/README.rst $(JDC)/jacdac/README.md $(BUILD)/config.cmake
@@ -63,7 +64,15 @@ boot: prep-build-gdb
 	echo 'mon reset_usb_boot' >> $(BUILD)/debug.gdb
 	echo "quit" >> $(BUILD)/debug.gdb
 	arm-none-eabi-gdb --command=$(BUILD)/debug.gdb $(ELF) < /dev/null
-	sleep 2
+
+load-gdb: prep-build-gdb
+	echo 'load' >> $(BUILD)/debug.gdb
+	echo "quit" >> $(BUILD)/debug.gdb
+	arm-none-eabi-gdb --command=$(BUILD)/debug.gdb $(ELF) < /dev/null
+
+rg: all
+	$(MAKE) boot
+	$(MAKE) load-gdb
 
 gdb: prep-build-gdb
 	arm-none-eabi-gdb --command=$(BUILD)/debug.gdb $(ELF)

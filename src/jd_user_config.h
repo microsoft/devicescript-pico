@@ -46,11 +46,11 @@
 #endif
 
 #if BRAIN_ID == BRAIN_ID_PICO_W
-#define PIN_LED 25
-#define PIN_LED_GND NO_PIN
 #define DEV_CLASS_NAME "Raspberry Pi Pico W"
 #define DEV_CLASS 0x3a513204
 #define WIFI_SUPPORTED 1
+void pico_w_set_led(uint8_t r, uint8_t g, uint8_t b);
+#define LED_SET_RGB pico_w_set_led
 #endif
 
 #ifndef DEV_CLASS_NAME
@@ -80,5 +80,14 @@
 #define JD_SEND_FRAME_SIZE 1024
 
 #define JD_LSTORE 0
+
+#define JD_SETTINGS_LARGE 1
+
+#define JD_FSTOR_TOTAL_SIZE (128 * 1024)
+#define SPI_FLASH_MEGS 1
+
+#define SPI_STORAGE_SIZE JD_FSTOR_TOTAL_SIZE
+#define SPI_STORAGE_OFFSET (SPI_FLASH_MEGS * 1024 * 1024 - SPI_STORAGE_SIZE)
+#define JD_FSTOR_BASE_ADDR (0x10000000 + SPI_STORAGE_OFFSET)
 
 #endif

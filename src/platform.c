@@ -8,7 +8,7 @@
 static uint64_t _jd_device_id;
 static int8_t irq_disabled;
 
-static uint32_t hw_random(void) {
+uint32_t hw_random(void) {
     uint8_t buf[16];
     for (int i = 0; i < sizeof(buf); ++i) {
         buf[i] = 0;
@@ -73,7 +73,7 @@ static void led_panic_blink(void) {
     target_wait_us(70000);
     pin_set(PIN_LED_R, 1);
     target_wait_us(70000);
-#else
+#elif defined(PIN_LED)
     pin_setup_output(PIN_LED);
     pin_setup_output(PIN_LED_GND);
     pin_set(PIN_LED_GND, 0);
@@ -81,6 +81,8 @@ static void led_panic_blink(void) {
     target_wait_us(70000);
     pin_set(PIN_LED, 0);
     target_wait_us(70000);
+#else
+    target_wait_us(140000);
 #endif
 }
 

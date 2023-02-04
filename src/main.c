@@ -25,6 +25,9 @@ void app_init_services(void) {
 
 #if WIFI_SUPPORTED
     wifi_init();
+    wsskhealth_init();
+    devscloud_init(&wssk_cloud);
+    tsagg_init(&wssk_cloud);
 #endif
 
     hidkeyboard_init();
@@ -33,12 +36,17 @@ void app_init_services(void) {
 }
 
 int main() {
+    stdio_init_all();
+
     platform_init();
     jd_init();
+
+    tim_max_sleep = 1000;
 
     while (true) {
         jd_process_everything();
         usb_process();
+        jd_tcpsock_process();
         if (!jd_rx_has_frame())
             __asm volatile("wfe");
     }
