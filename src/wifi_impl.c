@@ -1,13 +1,13 @@
 #include "jdpico.h"
 
-#if WIFI_SUPPORTED
+#if JD_WIFI
 
 #include "pico/cyw43_arch.h"
 
-// #define LOG_TAG "cyw43"
-// #include "devs_logging.h"
+#define LOG_TAG "cyw43"
+#include "devs_logging.h"
 
-#define LOG(msg, ...) printf(msg "\n", ##__VA_ARGS__)
+// #define LOG(msg, ...) printf(msg "\n", ##__VA_ARGS__)
 
 static jd_wifi_results_t *scan_res;
 static uint16_t scan_ptr, scan_size;
@@ -129,7 +129,7 @@ int jd_wifi_init(uint8_t mac_out[6]) {
     return 0;
 }
 
-void jd_tcpsock_process(void) {
+void jd_wifi_process(void) {
     cyw43_arch_poll();
 
     if (in_scan && !cyw43_wifi_scan_active(&cyw43_state)) {

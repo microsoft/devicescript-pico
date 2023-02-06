@@ -48,17 +48,13 @@
 #if BRAIN_ID == BRAIN_ID_PICO_W
 #define DEV_CLASS_NAME "Raspberry Pi Pico W"
 #define DEV_CLASS 0x3a513204
-#define WIFI_SUPPORTED 1
+#define JD_WIFI 1
 void pico_w_set_led(uint8_t r, uint8_t g, uint8_t b);
 #define LED_SET_RGB pico_w_set_led
 #endif
 
 #ifndef DEV_CLASS_NAME
 #error "invalid BRAIN_ID"
-#endif
-
-#ifndef WIFI_SUPPORTED
-#define WIFI_SUPPORTED 0
 #endif
 
 #define PIN_JACDAC 9

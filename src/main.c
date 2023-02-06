@@ -23,7 +23,7 @@ void app_init_services(void) {
     jd_role_manager_init();
     init_devicescript_manager();
 
-#if WIFI_SUPPORTED
+#if JD_WIFI
     wifi_init();
     wsskhealth_init();
     devscloud_init(&wssk_cloud);
