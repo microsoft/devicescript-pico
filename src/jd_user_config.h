@@ -1,9 +1,9 @@
 #ifndef JD_USER_CONFIG_H
 #define JD_USER_CONFIG_H
 
-#define DEVICE_DMESG_BUFFER_SIZE 4096
+#include <stdint.h>
 
-#include "dmesg.h"
+#define JD_DMESG_BUFFER_SIZE 4096
 
 #define BRAIN_ID_MSR124 124
 #define BRAIN_ID_MSR59 59
@@ -85,5 +85,7 @@ void pico_w_set_led(uint8_t r, uint8_t g, uint8_t b);
 #define SPI_STORAGE_SIZE JD_FSTOR_TOTAL_SIZE
 #define SPI_STORAGE_OFFSET (SPI_FLASH_MEGS * 1024 * 1024 - SPI_STORAGE_SIZE)
 #define JD_FSTOR_BASE_ADDR (0x10000000 + SPI_STORAGE_OFFSET)
+
+#define JD_FAST __attribute__((section(".time_critical.sws")))
 
 #endif

@@ -1,5 +1,7 @@
 #include "jdpico.h"
 
+#include <stdio.h>
+
 uint32_t now;
 
 const char app_dev_class_name[] = DEV_CLASS_NAME;
@@ -35,6 +37,17 @@ void app_init_services(void) {
     hidjoystick_init();
 }
 
+static bool dmesg_to_stdout() {
+    static uint32_t dmesg_ptr;
+    char buf[64];
+    unsigned len = jd_dmesg_read(buf, sizeof(buf), &dmesg_ptr);
+    if (len) {
+        fwrite(buf, len, 1, stdout);
+        return true;
+    }
+    return false;
+}
+
 int main() {
     stdio_init_all();
 
@@ -45,8 +58,9 @@ int main() {
 
     while (true) {
         jd_process_everything();
-        usb_process();
         jd_tcpsock_process();
+        if (dmesg_to_stdout())
+            continue;
         if (!jd_rx_has_frame())
             __asm volatile("wfe");
     }

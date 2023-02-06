@@ -14,7 +14,8 @@ static uint16_t scan_ptr, scan_size;
 static bool inited, in_scan;
 
 static int scan_result(void *env, const cyw43_ev_scan_result_t *result) {
-    if (result) {
+    if (result && result->ssid_len && result->ssid[0]) {
+        // LOG("ssid: '%s' %d %d", result->ssid , result->ssid_len, result->rssi);
         jd_wifi_results_t ent = {
             .rssi = result->rssi,
             .channel = result->channel,
@@ -37,7 +38,7 @@ static int scan_result(void *env, const cyw43_ev_scan_result_t *result) {
             if (scan_ptr >= scan_size) {
                 scan_size = scan_size * 2 + 5;
                 jd_wifi_results_t *tmp = jd_alloc(sizeof(jd_wifi_results_t) * scan_size);
-                memcpy(tmp, scan_res, scan_ptr);
+                memcpy(tmp, scan_res, scan_ptr * sizeof(jd_wifi_results_t));
                 jd_free(scan_res);
                 scan_res = tmp;
             }

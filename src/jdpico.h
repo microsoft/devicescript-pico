@@ -14,15 +14,11 @@ void jd_tcpsock_process(void);
 uint32_t hw_random(void);
 
 void usb_init(void);
-void usb_process(void);
-bool usb_is_connected(void);
 void hid_process(void);
 
 void reboot_to_uf2(void);
 
 void platform_init(void);
-
-#define REAL_TIME_FUNC __attribute__((section(".time_critical.sws")))
 
 typedef void (*cb_arg_t)(void *);
 void dma_set_ch_cb(uint8_t channel, cb_arg_t handler, void *context);
