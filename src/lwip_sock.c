@@ -75,7 +75,9 @@ static err_t tcp_client_connected(void *arg, struct tcp_pcb *tpcb, err_t err) {
         return ERR_OK;
     }
 
+    LOG("connected");
     state->connected = true;
+    jd_tcpsock_on_event(JD_CONN_EV_OPEN, NULL, 0);
     return ERR_OK;
 }
 
@@ -113,9 +115,11 @@ static err_t tcp_client_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, er
 static void host_found(const char *hostname, const ip_addr_t *ipaddr, void *arg) {
     sock_state_t *state = arg;
 
+    state->ipaddr = *ipaddr;
+
     LOG("connecting to %s:%d (%s)", hostname, state->port_num, ip4addr_ntoa(&state->ipaddr));
 
-    state->tcp_pcb = tcp_new_ip_type(IP_GET_TYPE(&state->remote_addr));
+    state->tcp_pcb = tcp_new_ip_type(IP_GET_TYPE(&state->ipaddr));
     if (!state->tcp_pcb) {
         raise_error(state, "can't alloc pcb");
         return;
