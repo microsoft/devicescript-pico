@@ -14,7 +14,7 @@ static volatile uint32_t last_set_iter;
 static volatile uint32_t last_delay;
 static volatile uint32_t last_delay_now;
 
-REAL_TIME_FUNC
+JD_FAST
 static void tim_handler(void) {
     timer_hw->intr = 1u << ALARM_NUM;
 
@@ -58,7 +58,7 @@ void tim_init() {
     hw_set_bits(&timer_hw->inte, 1u << ALARM_NUM);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void tim_set_timer(int delta, cb_t cb) {
     if (delta < 10)
         delta = 10;
@@ -75,7 +75,7 @@ void tim_set_timer(int delta, cb_t cb) {
     target_enable_irq();
 }
 
-REAL_TIME_FUNC
+JD_FAST
 uint64_t tim_get_micros() {
     // Need to make sure that the upper 32 bits of the timer
     // don't change, so read that first
@@ -95,7 +95,7 @@ uint64_t tim_get_micros() {
     return ((uint64_t)hi << 32u) | lo;
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void target_wait_us(uint32_t n) {
     uint32_t start = timer_hw->timerawl;
     while (timer_hw->timerawl - start < n)

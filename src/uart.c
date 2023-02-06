@@ -111,12 +111,12 @@ static inline void rx_done(void) {
     }
 }
 
-REAL_TIME_FUNC
+JD_FAST
 static void rx_handler(void *p) {
     rx_done();
 }
 
-REAL_TIME_FUNC
+JD_FAST
 static void tx_handler(void *p) {
     // first clear any pending stalls
     pio0->fdebug = (1u << (PIO_FDEBUG_TXSTALL_LSB + smtx));
@@ -137,7 +137,7 @@ static void tx_handler(void *p) {
     jd_tx_completed(0);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void isr_pio0_0() {
     uint32_t n = pio0->irq;
     pio0->irq = n;
@@ -146,14 +146,14 @@ void isr_pio0_0() {
     }
 }
 
-REAL_TIME_FUNC
+JD_FAST
 static void jd_tx_arm_pin(PIO pio, uint sm, uint pin) {
     pio_sm_set_pins_with_mask_(pio, sm, 1u << pin, 1u << pin);
     pio_sm_set_pindirs_with_mask_(pio, sm, 1u << pin, 1u << pin);
     pio_gpio_init_(pio, pin);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 static void jd_tx_program_init(PIO pio, uint sm, uint offset, uint pin, uint baud) {
     jd_tx_arm_pin(pio, sm, pin);
     pio_sm_config c = jd_tx_program_get_default_config(offset);
@@ -170,7 +170,7 @@ static void jd_tx_program_init(PIO pio, uint sm, uint offset, uint pin, uint bau
     pio_sm_set_enabled(pio, sm, false); // enable when need
 }
 
-REAL_TIME_FUNC
+JD_FAST
 static void jd_rx_arm_pin(PIO pio, uint sm, uint pin) {
 #ifdef DEBUG_PIN
     pio_sm_set_pins_with_mask_(pio, sm, 1u << DEBUG_PIN, 1u << DEBUG_PIN); // init high
@@ -185,7 +185,7 @@ static void jd_rx_arm_pin(PIO pio, uint sm, uint pin) {
     pin_set_pull(pin, PIN_PULL_UP);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 static void jd_rx_program_init(PIO pio, uint sm, uint offset, uint pin, uint baud) {
     jd_rx_arm_pin(pio, sm, pin);
     pio_sm_config c = jd_rx_program_get_default_config(offset);
@@ -259,7 +259,7 @@ int uart_wait_high(void) {
 
 void uart_flush_rx() {}
 
-REAL_TIME_FUNC
+JD_FAST
 void uart_disable() {
     uart_status = STATUS_IDLE;
     target_disable_irq();
@@ -275,12 +275,12 @@ void uart_disable() {
 
 // This is extracted to a function to make sure the compiler doesn't
 // insert stuff between checking the input pin and setting the mode.
-REAL_TIME_FUNC
+JD_FAST
 __attribute__((noinline)) uint32_t gpio_probe_and_set(sio_hw_t *hw, uint32_t pin) {
     return (hw->gpio_oe_set = hw->gpio_in & pin);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 int uart_start_tx(const void *data, uint32_t len) {
     exti_disable(PIN_JACDAC);
     // We assume EXTI runs at higher priority than us
@@ -316,7 +316,7 @@ int uart_start_tx(const void *data, uint32_t len) {
     return 0;
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void uart_start_rx(void *data, uint32_t len) {
     uart_status = STATUS_RX;
     jd_rx_arm_pin(pio0, smrx, PIN_JACDAC);

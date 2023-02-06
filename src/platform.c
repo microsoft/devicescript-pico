@@ -104,7 +104,7 @@ void reboot_to_uf2(void) {
     reset_usb_boot(0, 0);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void target_enable_irq(void) {
     irq_disabled--;
     if (irq_disabled <= 0) {
@@ -113,13 +113,13 @@ void target_enable_irq(void) {
     }
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void target_disable_irq(void) {
     asm volatile("cpsid i" : : : "memory");
     irq_disabled++;
 }
 
-REAL_TIME_FUNC
+JD_FAST
 int target_in_irq(void) {
     return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0;
 }

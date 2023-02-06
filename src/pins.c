@@ -59,7 +59,7 @@ static __force_inline void gpio_set_pulls_(uint gpio, bool up, bool down) {
                     PADS_BANK0_GPIO0_PUE_BITS | PADS_BANK0_GPIO0_PDE_BITS);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void isr_io_bank0() {
     io_irq_ctrl_hw_t *irq_ctrl_base = &iobank0_hw->proc0_irq_ctrl; // assume io irq only on core0
     for (uint gpio = 0; gpio < NUM_BANK0_GPIOS; gpio++) {
@@ -86,12 +86,12 @@ uint8_t jd_pwm_init(uint8_t pin, uint32_t period, uint32_t duty, uint8_t prescal
     return pin;
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void jd_pwm_set_duty(uint8_t pwm_id, uint32_t duty) {
     pwm_set_gpio_level(pwm_id, duty);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void jd_pwm_enable(uint8_t pwm_id, bool enabled) {
     if (enabled)
         gpio_set_function_(pwm_id, GPIO_FUNC_PWM);
@@ -99,13 +99,13 @@ void jd_pwm_enable(uint8_t pwm_id, bool enabled) {
         gpio_init_(pwm_id);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void pin_set(int pin, int v) {
     if ((uint8_t)pin != NO_PIN)
         gpio_put(pin, v);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void pin_pulse(int pin, int num) {
     if ((uint8_t)pin == NO_PIN)
         return;
@@ -116,7 +116,7 @@ void pin_pulse(int pin, int num) {
     }
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void pin_setup_output(int pin) {
     if ((uint8_t)pin != NO_PIN) {
         gpio_set_dir(pin, 1);
@@ -124,14 +124,14 @@ void pin_setup_output(int pin) {
     }
 }
 
-REAL_TIME_FUNC
+JD_FAST
 int pin_get(int pin) {
     if ((uint8_t)pin == NO_PIN)
         return -1;
     return gpio_get(pin);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void pin_setup_input(int pin, int pull) {
     if ((uint8_t)pin == NO_PIN)
         return;
@@ -140,14 +140,14 @@ void pin_setup_input(int pin, int pull) {
     gpio_set_function_(pin, GPIO_FUNC_SIO);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void pin_set_pull(int pin, int pull) {
     if ((uint8_t)pin == NO_PIN)
         return;
     gpio_set_pulls_(pin, pull > 0, pull < 0);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void pin_setup_analog_input(int pin) {
     if ((uint8_t)pin == NO_PIN)
         return;
@@ -155,7 +155,7 @@ void pin_setup_analog_input(int pin) {
     gpio_set_function_(pin, GPIO_FUNC_NULL);
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void pin_setup_output_af(int pin, int af) {
     if ((uint8_t)pin == NO_PIN)
         return;

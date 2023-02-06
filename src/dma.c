@@ -14,14 +14,14 @@ __force_inline void irq_set_mask_enabled_(uint32_t mask, bool enabled) {
     }
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void ram_irq_set_priority(uint num, uint8_t hardware_priority) {
     // note that only 32 bit writes are supported
     io_rw_32 *p = (io_rw_32 *)((PPB_BASE + M0PLUS_NVIC_IPR0_OFFSET) + (num & ~3u));
     *p = (*p & ~(0xffu << (8 * (num & 3u)))) | (((uint32_t)hardware_priority) << (8 * (num & 3u)));
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void ram_irq_set_enabled(uint num, bool enabled) {
     irq_set_mask_enabled_(1u << num, enabled);
 }
@@ -33,7 +33,7 @@ typedef struct {
 
 static DMAHandler dmaHandler[12]; // max channel 12
 
-REAL_TIME_FUNC
+JD_FAST
 void isr_dma_0() {
     uint mask = dma_hw->ints0;
     // write to clear
@@ -50,13 +50,13 @@ void isr_dma_0() {
     }
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void dma_dump(void) {
     DMESG("DMA ints0=%x inte0=%x en=%d", dma_hw->ints0, dma_hw->inte0,
           (int)irq_is_enabled(DMA_IRQ_0));
 }
 
-REAL_TIME_FUNC
+JD_FAST
 void dma_set_ch_cb(uint8_t channel, cb_arg_t handler, void *context) {
     if (channel >= 12)
         return;
