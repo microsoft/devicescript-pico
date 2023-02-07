@@ -39,17 +39,21 @@ void app_init_services(void) {
 
 static bool dmesg_to_stdout() {
     static uint32_t dmesg_ptr;
-    char buf[64];
+    static char buf[128];
+
+    if (!uart_log_can_write())
+        return true; // wait!
+
     unsigned len = jd_dmesg_read(buf, sizeof(buf), &dmesg_ptr);
     if (len) {
-        fwrite(buf, len, 1, stdout);
+        uart_log_write(buf, len);
         return true;
     }
     return false;
 }
 
 int main() {
-    stdio_init_all();
+    uart_log_init();
 
     platform_init();
     jd_init();
@@ -58,7 +62,9 @@ int main() {
 
     while (true) {
         jd_process_everything();
+#if JD_WIFI
         jd_tcpsock_process();
+#endif
         if (dmesg_to_stdout())
             continue;
         if (!jd_rx_has_frame())

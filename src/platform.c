@@ -22,6 +22,8 @@ uint32_t hw_random(void) {
 }
 
 void platform_init(void) {
+    DMESG("start!");
+
     uint32_t r = hw_random();
     DMESG("rand %x", r);
     jd_seed_random(r);

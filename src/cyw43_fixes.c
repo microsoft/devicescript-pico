@@ -6,6 +6,8 @@
 
 #include "jdpico.h"
 
+#if JD_WIFI
+
 // very simplified version of https://github.com/raspberrypi/pico-sdk/blob/master/src/rp2_common/pico_cyw43_arch/cyw43_arch_poll.c
 // the IRQ was conflicting with JD IRQs and wasn't used anyways
 
@@ -44,3 +46,5 @@ void cyw43_thread_check() {
     if (__get_current_exception() || get_core_num() != cyw43_core_num)
         JD_PANIC();
 }
+
+#endif

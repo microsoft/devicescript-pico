@@ -35,3 +35,7 @@ void exti_enable(uint8_t pin);
 #define IRQ_PRIORITY_TIM (2 << 6)
 #define IRQ_PRIORITY_EXTI (0 << 6)
 #define IRQ_PRIORITY_UART (0 << 6)
+
+bool uart_log_can_write(void);
+void uart_log_write(const void *buf, unsigned size);
+void uart_log_init(void);
