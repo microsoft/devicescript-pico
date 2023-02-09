@@ -1,5 +1,5 @@
 {
-    "$schema": "../rp2040deviceconfig-generated.schema.json",
+    "$schema": "../rp2040deviceconfig.schema.json",
     "devName": "RP2040 DeviceScript 59 v0.1",
     "devClass": "0x35a678a3",
     "pinJacdac": 9,

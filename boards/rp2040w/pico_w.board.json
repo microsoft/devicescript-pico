@@ -1,5 +1,5 @@
 {
-    "$schema": "../rp2040deviceconfig-generated.schema.json",
+    "$schema": "../rp2040deviceconfig.schema.json",
     "devName": "DeviceScript Raspberry Pi Pico W",
     "devClass": "0x3a513204",
     "pinJacdac": 9
