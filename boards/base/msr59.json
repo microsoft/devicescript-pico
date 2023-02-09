@@ -1,0 +1,31 @@
+{
+    "$schema": "../rp2040deviceconfig-generated.schema.json",
+    "devName": "RP2040 DeviceScript 59 v0.1",
+    "devClass": "0x35a678a3",
+    "pinJacdac": 9,
+    "led": {
+        "rgb": [
+            {
+                "pin": 11,
+                "mult": 250
+            },
+            {
+                "pin": 13,
+                "mult": 60
+            },
+            {
+                "pin": 15,
+                "mult": 150
+            }
+        ]
+    },
+    "_": [
+        {
+            "service": "power",
+            "pinEn": 19,
+            "pinFault": 25,
+            "mode": 2,
+            "faultIgnoreMs": 100
+        }
+    ]
+}

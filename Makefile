@@ -1,22 +1,23 @@
 _IGNORE0 := $(shell test -f Makefile.user || cp sample-Makefile.user Makefile.user)
 
 include Makefile.user
-BRAIN_ID ?= PICO_W
+BUILD_TYPE ?= cyw43
 
-BUILD = build/$(BRAIN_ID)
+BUILD = build/$(BUILD_TYPE)
 JDC = devicescript/runtime/jacdac-c
 
 EXE = devsrunner
 ELF = $(BUILD)/src/$(EXE).elf
 UF2 = $(BUILD)/src/$(EXE).uf2
 
-ifeq ($(BRAIN_ID),PICO_W)
+ifeq ($(BUILD_TYPE),cyw43)
 CMAKE_OPTIONS += -DPICO_BOARD=pico_w
 endif
 
 all: submodules refresh-version
 	cd $(BUILD) && cmake ../.. $(CMAKE_OPTIONS)
 	$(MAKE) -j16 -C $(BUILD)
+	$(MAKE) concat-configs
 
 r: flash
 f: flash
@@ -25,7 +26,7 @@ flash: all boot
 	sleep 2
 	cp $(UF2) /Volumes/RPI-RP2
 
-submodules: pico-sdk/lib/tinyusb/README.rst $(JDC)/jacdac/README.md $(BUILD)/config.cmake
+submodules: pico-sdk/lib/tinyusb/README.rst $(JDC)/jacdac/README.md $(BUILD)/config.cmake boards/$(BUILD_TYPE)
 
 # don't do --recursive - we don't want all tinyusb submodules
 
@@ -80,16 +81,19 @@ gdb: prep-build-gdb
 bump:
 	./$(JDC)/scripts/bump.sh
 
+concat-configs:
+	./scripts/concat-configs.sh $(BUILD_TYPE) $(UF2)
+
 # also keep ELF file for addr2line
 .PHONY: dist
 sub-dist: all
 	mkdir -p dist
-	cp $(UF2) dist/devicescript-rp2040-$(BRAIN_ID).uf2
-	cp $(ELF) dist/devicescript-rp2040-$(BRAIN_ID).elf
+	cp $(BUILD)/devicescript-rp2040-* dist/
+	cp $(BUILD)/settings-*.uf2 dist/
 
 dist:
-	$(MAKE) BRAIN_ID=MSR59 sub-dist
-	$(MAKE) BRAIN_ID=MSR124 sub-dist
+	$(MAKE) BUILD_TYPE=base sub-dist
+	$(MAKE) BUILD_TYPE=cyw43 sub-dist
 	ls -l dist/
 
 st:

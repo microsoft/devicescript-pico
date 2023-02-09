@@ -1,0 +1,303 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "definitions": {
+        "ButtonConfig": {
+            "additionalProperties": false,
+            "properties": {
+                "activeHigh": {
+                    "description": "Button is normally active-low and pulled high.\nThis makes it active-high and pulled low.",
+                    "type": "boolean"
+                },
+                "name": {
+                    "description": "Instance/role name to be assigned to service.",
+                    "type": "string"
+                },
+                "pin": {
+                    "$ref": "#/definitions/Pin"
+                },
+                "pinBacklight": {
+                    "$ref": "#/definitions/Pin",
+                    "description": "This pin is set high when the button is pressed."
+                },
+                "service": {
+                    "enum": [
+                        "button"
+                    ],
+                    "type": "string"
+                },
+                "variant": {
+                    "description": "Service variant (see service definition for possible values).",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "pin",
+                "service"
+            ],
+            "type": "object"
+        },
+        "HexInt": {
+            "type": [
+                "string",
+                "number"
+            ]
+        },
+        "LedChannel": {
+            "additionalProperties": false,
+            "properties": {
+                "mult": {
+                    "description": "Multiplier to compensate for different LED strengths.",
+                    "maximum": 255,
+                    "minimum": 0,
+                    "type": "integer"
+                },
+                "pin": {
+                    "$ref": "#/definitions/Pin"
+                }
+            },
+            "required": [
+                "pin"
+            ],
+            "type": "object"
+        },
+        "LedConfig": {
+            "additionalProperties": false,
+            "properties": {
+                "activeHigh": {
+                    "description": "Applies to all LED channels/pins.",
+                    "type": "boolean"
+                },
+                "isMono": {
+                    "description": "Defaults to `true` if `pin` is set and `type` is 0.\nOtherwise `false`.",
+                    "type": "boolean"
+                },
+                "pin": {
+                    "$ref": "#/definitions/Pin",
+                    "description": "If a single mono LED."
+                },
+                "rgb": {
+                    "description": "RGB LED driven by PWM.",
+                    "items": {
+                        "$ref": "#/definitions/LedChannel"
+                    },
+                    "type": "array"
+                },
+                "type": {
+                    "default": 0,
+                    "description": "0 - use `pin` or `rgb` as regular pins\n1 - use `pin` as WS2812B (supported only on some boards)\nOther options (in range 100+) are also possible on some boards.",
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "Pin": {
+            "type": [
+                "string",
+                "number"
+            ]
+        },
+        "PowerConfig": {
+            "additionalProperties": false,
+            "properties": {
+                "faultIgnoreMs": {
+                    "default": 16,
+                    "description": "How long (in milliseconds) to ignore the `pinFault` after enabling.",
+                    "type": "integer"
+                },
+                "mode": {
+                    "description": "Operation mode of pinEn\n0 - `pinEn` is active high\n1 - `pinEn` is active low\n2 - transistor-on-EN setup, where flt and en are connected at limiter\n3 - EN should be pulsed at 50Hz (10ms on, 10ms off) to enable the limiter",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Instance/role name to be assigned to service.",
+                    "type": "string"
+                },
+                "pinEn": {
+                    "$ref": "#/definitions/Pin"
+                },
+                "pinFault": {
+                    "$ref": "#/definitions/Pin",
+                    "description": "Always active low."
+                },
+                "pinLedPulse": {
+                    "$ref": "#/definitions/Pin",
+                    "description": "Additional power LED to pulse."
+                },
+                "pinPulse": {
+                    "$ref": "#/definitions/Pin",
+                    "description": "Active-low pin for pulsing battery banks."
+                },
+                "pinUsbDetect": {
+                    "$ref": "#/definitions/Pin",
+                    "description": "Pin that is high when we are connected to USB or similar power source."
+                },
+                "service": {
+                    "enum": [
+                        "power"
+                    ],
+                    "type": "string"
+                },
+                "variant": {
+                    "description": "Service variant (see service definition for possible values).",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "faultIgnoreMs",
+                "mode",
+                "pinEn",
+                "pinFault",
+                "service"
+            ],
+            "type": "object"
+        },
+        "RelayConfig": {
+            "additionalProperties": false,
+            "properties": {
+                "initalActive": {
+                    "description": "Whether to activate the relay upon boot.",
+                    "type": "boolean"
+                },
+                "ledActiveLow": {
+                    "description": "Which way to drive the `pinLed`",
+                    "type": "boolean"
+                },
+                "maxCurrent": {
+                    "description": "Maximum switching current in mA.",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Instance/role name to be assigned to service.",
+                    "type": "string"
+                },
+                "pin": {
+                    "$ref": "#/definitions/Pin",
+                    "description": "The driving pin."
+                },
+                "pinActiveLow": {
+                    "description": "When set, the relay is considered 'active' when `pin` is low.",
+                    "type": "boolean"
+                },
+                "pinFeedback": {
+                    "$ref": "#/definitions/Pin",
+                    "description": "Active-high pin that indicates the actual state of the relay."
+                },
+                "pinLed": {
+                    "$ref": "#/definitions/Pin",
+                    "description": "This pin will be driven when relay is active."
+                },
+                "service": {
+                    "enum": [
+                        "relay"
+                    ],
+                    "type": "string"
+                },
+                "variant": {
+                    "description": "Service variant (see service definition for possible values).",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "pin",
+                "service"
+            ],
+            "type": "object"
+        },
+        "RotaryEncoderConfig": {
+            "additionalProperties": false,
+            "properties": {
+                "clicksPerTurn": {
+                    "default": 12,
+                    "description": "How many clicks for full 360 turn.",
+                    "type": "integer"
+                },
+                "dense": {
+                    "description": "Encoder supports \"half-clicks\".",
+                    "type": "boolean"
+                },
+                "inverted": {
+                    "description": "Invert direction.",
+                    "type": "boolean"
+                },
+                "name": {
+                    "description": "Instance/role name to be assigned to service.",
+                    "type": "string"
+                },
+                "pin0": {
+                    "$ref": "#/definitions/Pin"
+                },
+                "pin1": {
+                    "$ref": "#/definitions/Pin"
+                },
+                "service": {
+                    "enum": [
+                        "rotary"
+                    ],
+                    "type": "string"
+                },
+                "variant": {
+                    "description": "Service variant (see service definition for possible values).",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "pin0",
+                "pin1",
+                "service"
+            ],
+            "type": "object"
+        },
+        "ServiceConfig": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/RotaryEncoderConfig"
+                },
+                {
+                    "$ref": "#/definitions/ButtonConfig"
+                },
+                {
+                    "$ref": "#/definitions/RelayConfig"
+                },
+                {
+                    "$ref": "#/definitions/PowerConfig"
+                }
+            ]
+        }
+    },
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "_": {
+            "description": "Services to mount.",
+            "items": {
+                "$ref": "#/definitions/ServiceConfig"
+            },
+            "type": "array"
+        },
+        "devClass": {
+            "$ref": "#/definitions/HexInt",
+            "description": "Device class code, typically given as a hex number starting with 0x3."
+        },
+        "devName": {
+            "description": "Name of the device.",
+            "type": "string"
+        },
+        "led": {
+            "$ref": "#/definitions/LedConfig"
+        },
+        "pinJacdac": {
+            "$ref": "#/definitions/Pin"
+        },
+        "pinPwrNILimHi": {
+            "$ref": "#/definitions/Pin"
+        }
+    },
+    "required": [
+        "devClass",
+        "devName"
+    ],
+    "type": "object"
+}
+

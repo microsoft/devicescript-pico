@@ -4,24 +4,11 @@
 
 uint32_t now;
 
-const char app_dev_class_name[] = DEV_CLASS_NAME;
-
-uint32_t app_get_device_class(void) {
-    return DEV_CLASS;
-}
-
-#ifdef PWR_CFG
-static power_config_t pwr_cfg = {PWR_CFG};
-#endif
-
 void app_init_services(void) {
-#ifdef PWR_CFG
-#ifdef PIN_PWR_N_ILIM_HI
-    pin_set(PIN_PWR_N_ILIM_HI, 0);
-    pin_setup_output(PIN_PWR_N_ILIM_HI);
-#endif
-    power_init(&pwr_cfg);
-#endif
+    uint8_t n_ilim_hi = dcfg_get_pin("pinPwrNILimHi");
+    pin_set(n_ilim_hi, 0);
+    pin_setup_output(n_ilim_hi);
+
     jd_role_manager_init();
     init_devicescript_manager();
 
