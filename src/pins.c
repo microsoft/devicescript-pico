@@ -26,6 +26,13 @@ static __force_inline void _gpio_set_irq_enabled(uint gpio, uint32_t events, boo
         hw_clear_bits(en_reg, events);
 }
 
+static __force_inline void gpio_set_input_enabled_(uint gpio, bool enabled) {
+    if (enabled)
+        hw_set_bits(&padsbank0_hw->io[gpio], PADS_BANK0_GPIO0_IE_BITS);
+    else
+        hw_clear_bits(&padsbank0_hw->io[gpio], PADS_BANK0_GPIO0_IE_BITS);
+}
+
 COPY void gpio_set_irq_enabled_(uint gpio, uint32_t events, bool enabled) {
     // Separate mask/force/status per-core, so check which core called, and
     // set the relevant IRQ controls.
@@ -153,6 +160,8 @@ void pin_setup_analog_input(int pin) {
         return;
     pin_set_pull(pin, PIN_PULL_NONE);
     gpio_set_function_(pin, GPIO_FUNC_NULL);
+    gpio_set_dir(pin, 0);
+    gpio_set_input_enabled_(pin, false);
 }
 
 JD_FAST
