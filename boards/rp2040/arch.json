@@ -1,0 +1,6 @@
+{
+    "$schema": "../rp2040archconfig.schema.json",
+    "name": "RP2040",
+    "id": "rp2040",
+    "dcfgOffset": "0x100dc000"
+}

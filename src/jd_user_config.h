@@ -5,14 +5,6 @@
 
 #define JD_DMESG_BUFFER_SIZE 4096
 
-#define BRAIN_ID_MSR124 124
-#define BRAIN_ID_MSR59 59
-#define BRAIN_ID_PICO_W 1
-
-#ifndef BRAIN_ID
-#error "define BRAIN_ID"
-#endif
-
 #define JD_LOG DMESG
 #define JD_WR_OVERHEAD 28
 

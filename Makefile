@@ -1,16 +1,16 @@
 _IGNORE0 := $(shell test -f Makefile.user || cp sample-Makefile.user Makefile.user)
 
 include Makefile.user
-BUILD_TYPE ?= cyw43
+BUILD_ARCH ?= rp2040w
 
-BUILD = build/$(BUILD_TYPE)
+BUILD = build/$(BUILD_ARCH)
 JDC = devicescript/runtime/jacdac-c
-
+CLI = node devicescript/cli/devicescript 
 EXE = devsrunner
 ELF = $(BUILD)/src/$(EXE).elf
 UF2 = $(BUILD)/src/$(EXE).uf2
 
-ifeq ($(BUILD_TYPE),cyw43)
+ifeq ($(BUILD_ARCH),rp2040w)
 CMAKE_OPTIONS += -DPICO_BOARD=pico_w
 endif
 
@@ -26,7 +26,7 @@ flash: all boot
 	sleep 2
 	cp $(UF2) /Volumes/RPI-RP2
 
-submodules: pico-sdk/lib/tinyusb/README.rst $(JDC)/jacdac/README.md $(BUILD)/config.cmake boards/$(BUILD_TYPE)
+submodules: pico-sdk/lib/tinyusb/README.rst $(JDC)/jacdac/README.md $(BUILD)/config.cmake boards/$(BUILD_ARCH)
 
 # don't do --recursive - we don't want all tinyusb submodules
 
@@ -40,7 +40,7 @@ pico-sdk/lib/tinyusb/README.rst:
 
 $(BUILD)/config.cmake: Makefile Makefile.user
 	mkdir -p $(BUILD)
-	echo "add_compile_options($(COMPILE_OPTIONS) -DBRAIN_ID=BRAIN_ID_$(BRAIN_ID))" > $@
+	echo "add_compile_options($(COMPILE_OPTIONS))" > $@
 
 FW_VERSION = $(shell sh $(JDC)/scripts/git-version.sh)
 
@@ -82,18 +82,18 @@ bump:
 	./$(JDC)/scripts/bump.sh
 
 concat-configs:
-	./scripts/concat-configs.sh $(BUILD_TYPE) $(UF2)
+	mkdir -p dist
+	$(CLI) binpatch --generic --uf2 $(UF2) --outdir dist boards/$(BUILD_ARCH)/*.board.json
 
 # also keep ELF file for addr2line
 .PHONY: dist
 sub-dist: all
-	mkdir -p dist
-	cp $(BUILD)/devicescript-rp2040-* dist/
-	cp $(BUILD)/settings-*.uf2 dist/
 
 dist:
-	$(MAKE) BUILD_TYPE=base sub-dist
-	$(MAKE) BUILD_TYPE=cyw43 sub-dist
+	rm -rf dist/
+	set -e; for f in `ls boards` ; do \
+	  if test -f boards/$$f/arch.json; then $(MAKE) BUILD_ARCH=$$f sub-dist ; fi ; \
+	done
 	ls -l dist/
 
 st:

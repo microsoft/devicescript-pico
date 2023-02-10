@@ -11,6 +11,10 @@
                 },
                 "name": {
                     "description": "Instance/role name to be assigned to service.",
+                    "examples": [
+                        "buttonA",
+                        "activityLed"
+                    ],
                     "type": "string"
                 },
                 "pin": {
@@ -40,7 +44,7 @@
         "HexInt": {
             "type": [
                 "string",
-                "number"
+                "integer"
             ]
         },
         "LedChannel": {
@@ -81,12 +85,14 @@
                     "items": {
                         "$ref": "#/definitions/LedChannel"
                     },
+                    "maxItems": 3,
+                    "minItems": 3,
                     "type": "array"
                 },
                 "type": {
                     "default": 0,
                     "description": "0 - use `pin` or `rgb` as regular pins\n1 - use `pin` as WS2812B (supported only on some boards)\nOther options (in range 100+) are also possible on some boards.",
-                    "type": "number"
+                    "type": "integer"
                 }
             },
             "type": "object"
@@ -94,7 +100,7 @@
         "Pin": {
             "type": [
                 "string",
-                "number"
+                "integer"
             ]
         },
         "PowerConfig": {
@@ -111,6 +117,10 @@
                 },
                 "name": {
                     "description": "Instance/role name to be assigned to service.",
+                    "examples": [
+                        "buttonA",
+                        "activityLed"
+                    ],
                     "type": "string"
                 },
                 "pinEn": {
@@ -169,6 +179,10 @@
                 },
                 "name": {
                     "description": "Instance/role name to be assigned to service.",
+                    "examples": [
+                        "buttonA",
+                        "activityLed"
+                    ],
                     "type": "string"
                 },
                 "pin": {
@@ -222,6 +236,10 @@
                 },
                 "name": {
                     "description": "Instance/role name to be assigned to service.",
+                    "examples": [
+                        "buttonA",
+                        "activityLed"
+                    ],
                     "type": "string"
                 },
                 "pin0": {
@@ -278,10 +296,16 @@
         },
         "devClass": {
             "$ref": "#/definitions/HexInt",
-            "description": "Device class code, typically given as a hex number starting with 0x3."
+            "description": "Device class code, typically given as a hex number starting with 0x3.",
+            "examples": [
+                "0x379ea214"
+            ]
         },
         "devName": {
             "description": "Name of the device.",
+            "examples": [
+                "Acme Corp. SuperIoT v1.3"
+            ],
             "type": "string"
         },
         "led": {
