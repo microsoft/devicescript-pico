@@ -26,14 +26,20 @@ flash: all boot
 	sleep 2
 	cp $(UF2) /Volumes/RPI-RP2
 
-submodules: pico-sdk/lib/tinyusb/README.rst $(JDC)/jacdac/README.md $(BUILD)/config.cmake boards/$(BUILD_ARCH)
+submodules: pico-sdk/lib/tinyusb/README.rst $(JDC)/jacdac/README.md \
+	$(BUILD)/config.cmake \
+	boards/$(BUILD_ARCH) \
+	devicescript/cli/built/devicescript-cli.cjs
 
-# don't do --recursive - we don't want all tinyusb submodules
+devicescript/cli/built/devicescript-cli.cjs: $(JDC)/jacdac/README.md
+	cd devicescript && yarn
+	cd devicescript && yarn build-fast
 
 $(JDC)/jacdac/README.md:
 	git submodule update --init
 	cd devicescript && git submodule update --init --recursive
 
+# don't do top-level --recursive - we don't want all tinyusb submodules
 pico-sdk/lib/tinyusb/README.rst:
 	git submodule update --init
 	cd pico-sdk && git submodule update --init
