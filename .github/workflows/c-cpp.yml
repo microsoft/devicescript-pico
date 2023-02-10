@@ -18,6 +18,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - uses: actions/setup-node@v3
+      with:
+          node-version: 18
+
     - name: Restore ARM GCC Cache
       id: arm-gcc-cache
       uses: actions/cache@v2
