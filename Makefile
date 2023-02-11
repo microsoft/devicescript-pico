@@ -2,6 +2,7 @@ _IGNORE0 := $(shell test -f Makefile.user || cp sample-Makefile.user Makefile.us
 
 include Makefile.user
 BUILD_ARCH ?= rp2040w
+BOARD ?= $(shell basename `cd boards/rp2040w; ls *.board.json | head -1` .board.json)
 
 BUILD = build/$(BUILD_ARCH)
 JDC = devicescript/runtime/jacdac-c
@@ -24,7 +25,7 @@ f: flash
 
 flash: all boot
 	sleep 2
-	cp $(UF2) /Volumes/RPI-RP2
+	cp dist/devicescript-$(BUILD_ARCH)-$(BOARD).uf2 /Volumes/RPI-RP2
 
 submodules: pico-sdk/lib/tinyusb/README.rst $(JDC)/jacdac/README.md \
 	$(BUILD)/config.cmake \
