@@ -22,6 +22,8 @@ void app_init_services(void) {
     hidkeyboard_init();
     hidmouse_init();
     hidjoystick_init();
+
+    jd_scan_all();
 }
 
 static bool dmesg_to_stdout() {

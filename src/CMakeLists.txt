@@ -27,6 +27,7 @@ target_link_libraries(devsrunner
         hardware_dma
         hardware_irq
         hardware_adc
+        hardware_i2c
         cmsis_core
         tinyusb_device
 )
