@@ -2,5 +2,6 @@
     "$schema": "../rp2040archconfig.schema.json",
     "name": "RP2040 + CYW43 WiFi",
     "id": "rp2040w",
-    "dcfgOffset": "0x100dc000"
+    "dcfgOffset": "0x100dc000",
+    "uf2Align": 4096
 }

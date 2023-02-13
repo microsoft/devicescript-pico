@@ -2,9 +2,11 @@
     "$schema": "../rp2040deviceconfig.schema.json",
     "devName": "DeviceScript Raspberry Pi Pico W",
     "devClass": "0x3a513204",
-    "pinJacdac": 9,
     "i2c": {
-        "sda": 4,
-        "scl": 5
+        "pinSDA": 4,
+        "pinSCL": 5
+    },
+    "jacdac": {
+        "pin": 9
     }
 }

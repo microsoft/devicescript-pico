@@ -61,6 +61,7 @@
                     "type": "string"
                 },
                 "pin": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
                 "pinBacklight": {
@@ -98,21 +99,36 @@
                     "description": "Hardware instance index.",
                     "type": "integer"
                 },
-                "khz": {
+                "kHz": {
                     "default": 100,
                     "description": "How fast to run the I2C, typically either 100 or 400.",
                     "type": "integer"
                 },
-                "scl": {
+                "pinSCL": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
-                "sda": {
+                "pinSDA": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 }
             },
             "required": [
-                "scl",
-                "sda"
+                "pinSCL",
+                "pinSDA"
+            ],
+            "type": "object"
+        },
+        "JacdacConfig": {
+            "additionalProperties": false,
+            "properties": {
+                "pin": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "pin"
             ],
             "type": "object"
         },
@@ -126,6 +142,7 @@
                     "type": "integer"
                 },
                 "pin": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 }
             },
@@ -319,6 +336,7 @@
                     "type": "string"
                 },
                 "pinEn": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
                 "pinFault": {
@@ -506,9 +524,11 @@
                     "type": "string"
                 },
                 "pin0": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
                 "pin1": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
                 "service": {
@@ -794,13 +814,14 @@
         "i2c": {
             "$ref": "#/definitions/I2CConfig"
         },
+        "jacdac": {
+            "$ref": "#/definitions/JacdacConfig"
+        },
         "led": {
             "$ref": "#/definitions/LedConfig"
         },
-        "pinJacdac": {
-            "type": "integer"
-        },
         "pinPwrNILimHi": {
+            "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
             "type": "integer"
         }
     },

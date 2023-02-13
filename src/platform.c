@@ -39,10 +39,6 @@ void platform_init(void) {
     usb_init();
 }
 
-int jd_pin_num(void) {
-    return PIN_JACDAC;
-}
-
 uint64_t hw_device_id(void) {
     return _jd_device_id;
 }

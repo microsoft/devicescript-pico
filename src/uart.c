@@ -24,6 +24,7 @@ static uint txprog, rxprog;
 static uint8_t smtx = 0;
 static uint8_t smrx = 1;
 static uint16_t uart_status;
+static uint8_t jacdac_pin;
 
 static inline void pio_gpio_init_(PIO pio, uint pin) {
     check_pio_param(pio);
@@ -125,13 +126,14 @@ static void tx_handler(void *p) {
         ;
 
     // send final BRK
-    pin_set(PIN_JACDAC, 1);
-    pin_setup_output(PIN_JACDAC);
-    pin_setup_output_af(PIN_JACDAC, GPIO_FUNC_SIO);
+    uint8_t pin = jacdac_pin;
+    pin_set(pin, 1);
+    pin_setup_output(pin);
+    pin_setup_output_af(pin, GPIO_FUNC_SIO);
     target_wait_us(1);
-    pin_set(PIN_JACDAC, 0);
+    pin_set(pin, 0);
     target_wait_us(12);
-    pin_set(PIN_JACDAC, 1);
+    pin_set(pin, 1);
     uart_disable();
 
     jd_tx_completed(0);
@@ -174,13 +176,14 @@ JD_FAST
 static void jd_rx_arm_pin(PIO pio, uint sm, uint pin) {
 #ifdef DEBUG_PIN
     pio_sm_set_pins_with_mask_(pio, sm, 1u << DEBUG_PIN, 1u << DEBUG_PIN); // init high
-    pio_sm_set_pindirs_with_mask_(pio, sm, (0u << pin) | (1u << DEBUG_PIN), (1u << pin) | (1u << DEBUG_PIN));
+    pio_sm_set_pindirs_with_mask_(pio, sm, (0u << pin) | (1u << DEBUG_PIN),
+                                  (1u << pin) | (1u << DEBUG_PIN));
     pio_gpio_init_(pio, DEBUG_PIN);
     gpio_set_outover(DEBUG_PIN, GPIO_OVERRIDE_NORMAL);
 #else
     pio_sm_set_consecutive_pindirs_(pio, sm, pin, 1, false);
 #endif
-    exti_disable(PIN_JACDAC);
+    exti_disable(pin);
     pio_gpio_init_(pio, pin);
     pin_set_pull(pin, PIN_PULL_UP);
 }
@@ -203,16 +206,21 @@ static void jd_rx_program_init(PIO pio, uint sm, uint offset, uint pin, uint bau
 }
 
 void uart_init_() {
-    pin_set(PIN_JACDAC, 1);
-    pin_setup_output(PIN_JACDAC);             // yank it up
-    pin_setup_input(PIN_JACDAC, PIN_PULL_UP); // and keep it up
+    uint8_t pin = dcfg_get_pin("jacdac.pin");
+    jacdac_pin = pin;
+    if (pin == NO_PIN)
+        return;
+
+    pin_set(pin, 1);
+    pin_setup_output(pin);             // yank it up
+    pin_setup_input(pin, PIN_PULL_UP); // and keep it up
 
     txprog = pio_add_program(pio0, &jd_tx_program);
     rxprog = pio_add_program(pio0, &jd_rx_program);
 
     uint baudrate = 1000000;
-    jd_tx_program_init(pio0, smtx, txprog, PIN_JACDAC, baudrate);
-    jd_rx_program_init(pio0, smrx, rxprog, PIN_JACDAC, baudrate);
+    jd_tx_program_init(pio0, smtx, txprog, pin, baudrate);
+    jd_rx_program_init(pio0, smrx, rxprog, pin, baudrate);
 
     // fixed dma channels
     dmachRx = dma_claim_unused_channel(true);
@@ -238,7 +246,7 @@ void uart_init_() {
     dma_channel_configure(dmachTx, &c, &pio0->txf[smtx], NULL, 0, false);
     // pio irq for dma rx break handling
 
-    exti_set_callback(PIN_JACDAC, jd_line_falling, EXTI_FALLING);
+    exti_set_callback(pin, jd_line_falling, EXTI_FALLING);
 
     ram_irq_set_priority(DMA_IRQ_0, IRQ_PRIORITY_UART);
     ram_irq_set_priority(PIO0_IRQ_0, IRQ_PRIORITY_UART);
@@ -249,7 +257,8 @@ void uart_init_() {
 
 int uart_wait_high(void) {
     int timeout = 50000;
-    while (timeout-- > 0 && !pin_get(PIN_JACDAC))
+    uint8_t pin = jacdac_pin;
+    while (timeout-- > 0 && !pin_get(pin))
         ;
     if (timeout <= 0)
         return -1;
@@ -261,15 +270,18 @@ void uart_flush_rx() {}
 
 JD_FAST
 void uart_disable() {
+    uint8_t pin = jacdac_pin;
+    if (pin == NO_PIN)
+        return;
     uart_status = STATUS_IDLE;
     target_disable_irq();
     dma_hw->abort = (1 << dmachRx) | (1 << dmachTx);
-    pin_setup_input(PIN_JACDAC, PIN_PULL_UP);
-    pin_setup_output_af(PIN_JACDAC, GPIO_FUNC_SIO); // release gpio
+    pin_setup_input(pin, PIN_PULL_UP);
+    pin_setup_output_af(pin, GPIO_FUNC_SIO); // release gpio
     pio_sm_set_enabled(pio0, smtx, false);
     pio_sm_set_enabled(pio0, smrx, false);
     pio_set_irq0_source_enabled(pio0, pis_interrupt1, false);
-    exti_enable(PIN_JACDAC);
+    exti_enable(pin);
     target_enable_irq();
 }
 
@@ -282,7 +294,12 @@ __attribute__((noinline)) uint32_t gpio_probe_and_set(sio_hw_t *hw, uint32_t pin
 
 JD_FAST
 int uart_start_tx(const void *data, uint32_t len) {
-    exti_disable(PIN_JACDAC);
+    uint8_t pin = jacdac_pin;
+    if (pin == NO_PIN) {
+        jd_tx_completed(0);
+        return 0; // pretend no error so the send buffer won't overflow all the time
+    }
+    exti_disable(pin);
     // We assume EXTI runs at higher priority than us
     // If we got hit by EXTI, before we managed to disable it,
     // the reception routine would have enabled UART in RX mode
@@ -292,8 +309,8 @@ int uart_start_tx(const void *data, uint32_t len) {
     }
     JD_ASSERT(uart_status == 0);
     uart_status = STATUS_TX;
-    pin_set(PIN_JACDAC, 0);
-    if (!gpio_probe_and_set(sio_hw, (1 << PIN_JACDAC))) {
+    pin_set(pin, 0);
+    if (!gpio_probe_and_set(sio_hw, (1 << pin))) {
         // this is equivalent to irq priority when running from EXTI
         target_disable_irq();
         jd_line_falling();
@@ -301,11 +318,11 @@ int uart_start_tx(const void *data, uint32_t len) {
         return -1;
     }
     target_wait_us(12);
-    pin_set(PIN_JACDAC, 1);
+    pin_set(pin, 1);
 
     target_wait_us(49);
 
-    jd_tx_arm_pin(pio0, smtx, PIN_JACDAC);
+    jd_tx_arm_pin(pio0, smtx, pin);
     pio_sm_set_enabled(pio0, smtx, true);
     dma_set_ch_cb(dmachTx, tx_handler, NULL);
     dma_channel_transfer_from_buffer_now(dmachTx, data, len);
@@ -318,9 +335,10 @@ int uart_start_tx(const void *data, uint32_t len) {
 
 JD_FAST
 void uart_start_rx(void *data, uint32_t len) {
+    JD_ASSERT(jacdac_pin != NO_PIN);
     uart_status = STATUS_RX;
-    jd_rx_arm_pin(pio0, smrx, PIN_JACDAC);
-    // jd_rx_program_init(pio0, smrx, rxprog, PIN_JACDAC, baudrate);
+    jd_rx_arm_pin(pio0, smrx, jacdac_pin);
+    // jd_rx_program_init(pio0, smrx, rxprog, jacdac_pin, baudrate);
     pio_sm_set_enabled(pio0, smrx, true);
 
     pio0->irq = PIO_BREAK_IRQ; // clear irq

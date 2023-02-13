@@ -16,8 +16,8 @@ int i2c_init_(void) {
     if (i2c_inst)
         return 0;
 
-    sda = dcfg_get_pin("i2c.sda");
-    scl = dcfg_get_pin("i2c.scl");
+    sda = dcfg_get_pin("i2c.pinSDA");
+    scl = dcfg_get_pin("i2c.pinSCL");
     if (sda == 0xff || scl == 0xff)
         return -1;
 
@@ -31,7 +31,7 @@ int i2c_init_(void) {
     }
 
     i2c_inst = I2C_INST(sda);
-    int khz = dcfg_get_i32("i2c.khz", 100);
+    int khz = dcfg_get_i32("i2c.kHz", 100);
 
     i2c_init(i2c_inst, khz * 1000);
 
