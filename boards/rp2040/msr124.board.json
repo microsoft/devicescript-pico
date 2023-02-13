@@ -3,7 +3,9 @@
     "devName": "RP2040 DeviceScript 124 v0.1",
     "devClass": "0x3875e80d",
     "pinPwrNILimHi": 18,
-    "pinJacdac": 9,
+    "jacdac": {
+        "pin": 9
+    },
     "led": {
         "rgb": [
             {

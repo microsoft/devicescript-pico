@@ -249,6 +249,24 @@
             ],
             "type": "object"
         },
+        "LogConfig": {
+            "additionalProperties": false,
+            "properties": {
+                "baud": {
+                    "default": 115200,
+                    "description": "Speed to use.",
+                    "type": "integer"
+                },
+                "pinTX": {
+                    "description": "Where to send logs.",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "pinTX"
+            ],
+            "type": "object"
+        },
         "PotentiometerConfig": {
             "additionalProperties": false,
             "properties": {
@@ -819,6 +837,9 @@
         },
         "led": {
             "$ref": "#/definitions/LedConfig"
+        },
+        "log": {
+            "$ref": "#/definitions/LogConfig"
         },
         "pinPwrNILimHi": {
             "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",

@@ -24,15 +24,25 @@ stdio_driver_t stdio_dmesg = {
 };
 
 void uart_log_init() {
-    dmachTx = dma_claim_unused_channel(true);
-    dma_channel_config c = dma_channel_get_default_config(dmachTx);
-    channel_config_set_transfer_data_size(&c, DMA_SIZE_8);
-    channel_config_set_dreq(&c, uart_get_dreq(uart_default, true));
+    uint8_t tx_pin = dcfg_get_pin("log.pinTX");
 
-    dma_channel_configure(dmachTx, &c, &uart_get_hw(uart_default)->dr, NULL, 0, false);
+    if (tx_pin != NO_PIN && ((tx_pin & 3) != 0)) {
+        DMESG("! invalid log.pinTX");
+        tx_pin = NO_PIN;
+    }
 
-    uart_init(uart_default, PICO_DEFAULT_UART_BAUD_RATE);
-    gpio_set_function(PICO_DEFAULT_UART_TX_PIN, GPIO_FUNC_UART);
+    if (tx_pin == NO_PIN) {
+        dmachTx = -2;
+    } else {
+        dmachTx = dma_claim_unused_channel(true);
+        dma_channel_config c = dma_channel_get_default_config(dmachTx);
+        channel_config_set_transfer_data_size(&c, DMA_SIZE_8);
+        uart_inst_t *inst = (tx_pin >> 2) & 1 ? uart1 : uart0;
+        channel_config_set_dreq(&c, uart_get_dreq(inst, true));
+        dma_channel_configure(dmachTx, &c, &uart_get_hw(inst)->dr, NULL, 0, false);
+        uart_init(inst, dcfg_get_u32("log.baud", 115200));
+        gpio_set_function(tx_pin, GPIO_FUNC_UART);
+    }
 
     stdio_set_driver_enabled(&stdio_dmesg, true);
 }
@@ -46,6 +56,8 @@ static void tx_handler(void *p) {
 }
 
 void uart_log_write(const void *buf, unsigned size) {
+    if (dmachTx == -2)
+        return; // disabled
     if (dmachTx == -1)
         uart_log_init();
     JD_ASSERT(!in_tx);
