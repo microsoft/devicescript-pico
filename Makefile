@@ -2,7 +2,7 @@ _IGNORE0 := $(shell test -f Makefile.user || cp sample-Makefile.user Makefile.us
 
 include Makefile.user
 BUILD_ARCH ?= rp2040w
-BOARD ?= $(shell basename `cd boards/rp2040w; ls *.board.json | head -1` .board.json)
+BOARD ?= $(shell basename `cd boards/$(BUILD_ARCH); ls *.board.json | head -1` .board.json)
 
 BUILD = build/$(BUILD_ARCH)
 JDC = devicescript/runtime/jacdac-c
@@ -90,7 +90,7 @@ bump:
 
 concat-configs:
 	mkdir -p dist
-	$(CLI) binpatch --generic --uf2 $(UF2) --outdir dist boards/$(BUILD_ARCH)/*.board.json
+	$(CLI) binpatch --slug microsoft/jacdac-pico --generic --uf2 $(UF2) --outdir dist boards/$(BUILD_ARCH)/*.board.json
 
 # also keep ELF file for addr2line
 .PHONY: dist

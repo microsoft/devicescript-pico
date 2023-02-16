@@ -3,6 +3,7 @@
     "devName": "RP2040 DeviceScript 59 v0.1",
     "devClass": "0x35a678a3",
     "jacdac": {
+        "$connector": "Jacdac",
         "pin": 9
     },
     "led": {
@@ -24,6 +25,7 @@
     "_": [
         {
             "service": "power",
+            "name": "power",
             "pinEn": 19,
             "pinFault": 25,
             "mode": 2,
