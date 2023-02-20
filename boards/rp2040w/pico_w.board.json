@@ -1,6 +1,6 @@
 {
     "$schema": "../rp2040deviceconfig.schema.json",
-    "devName": "DeviceScript Raspberry Pi Pico W",
+    "devName": "Raspberry Pi Pico W",
     "url": "https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html",
     "devClass": "0x3a513204",
     "i2c": {
