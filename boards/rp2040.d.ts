@@ -1,6 +1,8 @@
-/// <reference path="../devicescript/runtime/jacdac-c/dcfg/srvcfg.d.ts" />
-
-import { ArchConfig, DeviceConfig, Pin } from "@devicescript/srvcfg"
+import { Pin } from "@devicescript/srvcfg"
+import {
+    ArchConfig,
+    DeviceConfig,
+} from "../devicescript/compiler/src/archconfig"
 
 interface RP2040DeviceConfig extends DeviceConfig {
     pinPwrNILimHi?: Pin
