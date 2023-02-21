@@ -1,0 +1,40 @@
+{
+    "$schema": "../rp2040deviceconfig.schema.json",
+    "devName": "Raspberry Pi Pico",
+    "url": "https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html",
+    "productId": "0x3f6e1f0c",
+    "led": {
+        "pin": 25
+    },
+    "pins": {
+        "P1": 1,
+        "P2": 2,
+        "P3": 3,
+        "P4": 4,
+        "P5": 5,
+        "P6": 6,
+        "P7": 7,
+        "P8": 8,
+        "P9": 9,
+        "P10": 10,
+        "P11": 11,
+        "P12": 12,
+        "P13": 13,
+        "P14": 14,
+        "P15": 15,
+        "P16": 16,
+        "P17": 17,
+        "P18": 18,
+        "P19": 19,
+        "P20": 20,
+        "P21": 21,
+        "P22": 22,
+        "P26": 26,
+        "P27": 27,
+        "P28": 28
+    },
+    "log": {
+        "pinTX": 0,
+        "baud": 115200
+    }
+}
