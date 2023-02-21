@@ -3,5 +3,10 @@
     "name": "RP2040 + CYW43 WiFi",
     "id": "rp2040w",
     "dcfgOffset": "0x100dc000",
-    "uf2Align": 4096
+    "uf2Align": 4096,
+    "pins": {
+        "io": "0-22,analogIn",
+        "analogIn": "26-28",
+        "wifi": "23,24,25,29"
+    }
 }

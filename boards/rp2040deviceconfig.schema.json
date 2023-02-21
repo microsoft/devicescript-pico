@@ -1323,19 +1323,8 @@
             "description": "Short description of the board.",
             "type": "string"
         },
-        "$fwUrl": {
-            "description": "Where to download BIN/UF2 file.\nAuto-populated.",
-            "type": "string"
-        },
         "$schema": {
             "type": "string"
-        },
-        "_": {
-            "description": "Services to mount.",
-            "items": {
-                "$ref": "#/definitions/ServiceConfig"
-            },
-            "type": "array"
         },
         "archId": {
             "description": "Architecture for the board.\nThis is auto-populated from arch.json file.",
@@ -1354,14 +1343,6 @@
         },
         "i2c": {
             "$ref": "#/definitions/I2CConfig"
-        },
-        "id": {
-            "description": "A short ID of the board.\nThis is auto-populated from file name.",
-            "examples": [
-                "adafruit_qt_py_c3",
-                "esp32_devkit_c"
-            ],
-            "type": "string"
         },
         "jacdac": {
             "$ref": "#/definitions/JacdacConfig"
@@ -1385,6 +1366,13 @@
             "examples": [
                 "0x379ea214"
             ]
+        },
+        "services": {
+            "description": "Services to mount. Each starts with { \"service\": \"...\" }",
+            "items": {
+                "$ref": "#/definitions/ServiceConfig"
+            },
+            "type": "array"
         },
         "url": {
             "description": "Where to buy/read more.",

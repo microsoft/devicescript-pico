@@ -3,5 +3,9 @@
     "name": "RP2040",
     "id": "rp2040",
     "dcfgOffset": "0x100dc000",
-    "uf2Align": 4096
+    "uf2Align": 4096,
+    "pins": {
+        "io": "0-29",
+        "analogIn": "26-29"
+    }
 }
