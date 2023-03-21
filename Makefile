@@ -86,7 +86,7 @@ gdb: prep-build-gdb
 	arm-none-eabi-gdb --command=$(BUILD)/debug.gdb $(ELF)
 
 bump:
-	./$(JDC)/scripts/bump.sh
+	node devicescript/scripts/bumparch.mjs
 
 concat-configs:
 	mkdir -p dist

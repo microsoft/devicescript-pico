@@ -9,21 +9,17 @@ void app_init_services(void) {
     pin_set(n_ilim_hi, 0);
     pin_setup_output(n_ilim_hi);
 
-    jd_role_manager_init();
-    init_devicescript_manager();
+    devs_service_full_init(NULL);
 
-#if JD_WIFI
-    wifi_init();
-    wsskhealth_init();
-    devscloud_init(&wssk_cloud);
-    tsagg_init(&wssk_cloud);
-#endif
-
+    // TODO make this conditional
     hidkeyboard_init();
     hidmouse_init();
     hidjoystick_init();
 
-    jd_scan_all();
+    if (i2c_init_() == 0) {
+        jd_scan_all();
+        i2cserv_init();
+    }
 }
 
 static bool dmesg_to_stdout() {

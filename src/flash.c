@@ -61,8 +61,3 @@ void flash_erase(void *page_addr) {
     flash_range_erase(diff + SPI_STORAGE_OFFSET, JD_FLASH_PAGE_SIZE);
     target_enable_irq();
 }
-
-void init_devicescript_manager(void) {
-    devsmgr_init(NULL);
-    devsdbg_init();
-}
