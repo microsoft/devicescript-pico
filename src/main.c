@@ -5,10 +5,6 @@
 uint32_t now;
 
 void app_init_services(void) {
-    uint8_t n_ilim_hi = dcfg_get_pin("pinPwrNILimHi");
-    pin_set(n_ilim_hi, 0);
-    pin_setup_output(n_ilim_hi);
-
     devs_service_full_init(NULL);
 
     // TODO make this conditional

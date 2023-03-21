@@ -69,7 +69,6 @@
                     "type": "string"
                 },
                 "pin": {
-                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
                 "pinBacklight": {
@@ -126,11 +125,9 @@
                     "type": "integer"
                 },
                 "pinSCL": {
-                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
                 "pinSDA": {
-                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 }
             },
@@ -155,7 +152,6 @@
                     "type": "string"
                 },
                 "pin": {
-                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 }
             },
@@ -178,7 +174,6 @@
                     "type": "integer"
                 },
                 "pin": {
-                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 }
             },
@@ -203,7 +198,11 @@
                     "type": "boolean"
                 },
                 "pin": {
-                    "description": "If a single mono LED.",
+                    "description": "If a single mono LED, or programmable RGB LED.",
+                    "type": "integer"
+                },
+                "pinCLK": {
+                    "description": "Clock pin, if any.",
                     "type": "integer"
                 },
                 "rgb": {
@@ -217,7 +216,7 @@
                 },
                 "type": {
                     "default": 0,
-                    "description": "0 - use `pin` or `rgb` as regular pins\n1 - use `pin` as WS2812B (supported only on some boards)\nOther options (in range 100+) are also possible on some boards.",
+                    "description": "0 - use `pin` or `rgb` as regular pins\n1 - use `pin` as WS2812B (supported only on some boards)\n2 - use `pin` as APA102 DATA, and `pinCLK` as CLOCK\n3 - use `pin` as SK9822 DATA, and `pinCLK` as CLOCK\nOther options (in range 100+) are also possible on some boards.",
                     "type": "integer"
                 }
             },
@@ -386,6 +385,10 @@
                     "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
+                "BOOT": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
+                    "type": "integer"
+                },
                 "CS": {
                     "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
@@ -455,6 +458,22 @@
                     "type": "integer"
                 },
                 "LED": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
+                    "type": "integer"
+                },
+                "LED0": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
+                    "type": "integer"
+                },
+                "LED1": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
+                    "type": "integer"
+                },
+                "LED2": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
+                    "type": "integer"
+                },
+                "LED3": {
                     "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
@@ -741,6 +760,14 @@
                 "TX": {
                     "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
+                },
+                "VN": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
+                    "type": "integer"
+                },
+                "VP": {
+                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
+                    "type": "integer"
                 }
             },
             "type": "object"
@@ -840,7 +867,6 @@
                     "type": "string"
                 },
                 "pinEn": {
-                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
                 "pinFault": {
@@ -957,6 +983,10 @@
                     "description": "All fields starting with '#' arg ignored",
                     "type": "string"
                 },
+                "activeLow": {
+                    "description": "When set, the relay is considered 'active' when `pin` is low.",
+                    "type": "boolean"
+                },
                 "initalActive": {
                     "description": "Whether to activate the relay upon boot.",
                     "type": "boolean"
@@ -980,10 +1010,6 @@
                 "pin": {
                     "description": "The driving pin.",
                     "type": "integer"
-                },
-                "pinActiveLow": {
-                    "description": "When set, the relay is considered 'active' when `pin` is low.",
-                    "type": "boolean"
                 },
                 "pinFeedback": {
                     "description": "Active-high pin that indicates the actual state of the relay.",
@@ -1040,11 +1066,9 @@
                     "type": "string"
                 },
                 "pin0": {
-                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
                 "pin1": {
-                    "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
                     "type": "integer"
                 },
                 "service": {
@@ -1102,6 +1126,21 @@
                     "$ref": "#/definitions/AccelerometerConfig"
                 }
             ]
+        },
+        "SetupPin": {
+            "additionalProperties": false,
+            "properties": {
+                "out": {
+                    "type": "integer"
+                },
+                "pin": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "pin"
+            ],
+            "type": "object"
         },
         "SoilMoistureConfig": {
             "additionalProperties": false,
@@ -1353,10 +1392,6 @@
         "log": {
             "$ref": "#/definitions/LogConfig"
         },
-        "pinPwrNILimHi": {
-            "description": "Hardware pin number. In future we may allow labels.\nNaming convention - fields with `Pin` type start with `pin*`",
-            "type": "integer"
-        },
         "pins": {
             "$ref": "#/definitions/PinLabels"
         },
@@ -1367,10 +1402,24 @@
                 "0x379ea214"
             ]
         },
+        "progName": {
+            "description": "Name of the program, derived from package.json. Exposed as `program_name` register.",
+            "type": "string"
+        },
+        "progVersion": {
+            "description": "Version number of the program, derived from package.json and git. Exposed as `program_version` register.",
+            "type": "string"
+        },
         "services": {
             "description": "Services to mount. Each starts with { \"service\": \"...\" }",
             "items": {
                 "$ref": "#/definitions/ServiceConfig"
+            },
+            "type": "array"
+        },
+        "setupPins": {
+            "items": {
+                "$ref": "#/definitions/SetupPin"
             },
             "type": "array"
         },

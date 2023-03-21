@@ -2,7 +2,13 @@
     "$schema": "../rp2040deviceconfig.schema.json",
     "devName": "MSR RP2040 Brain 124 v0.1",
     "productId": "0x3875e80d",
-    "pinPwrNILimHi": 18,
+    "setupPins": [
+        {
+            "#": "Enable hi-power limiter mode",
+            "pin": 18,
+            "out": 0
+        }
+    ],
     "jacdac": {
         "$connector": "Jacdac",
         "pin": 9
