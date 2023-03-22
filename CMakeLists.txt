@@ -25,9 +25,14 @@ add_compile_options(-Wall
     -ffunction-sections
 )
 
+
 include(${CMAKE_BINARY_DIR}/config.cmake)
 
 pico_sdk_init()
+
+if(PICO_CYW43_SUPPORTED)
+    add_compile_options(-DJD_WIFI=1)
+endif()
 
 add_subdirectory(src)
 
