@@ -45,5 +45,6 @@
 #define JD_FAST __attribute__((section(".time_critical.sws")))
 
 #define JD_I2C_HELPERS 1
+#define JD_HID 1
 
 #endif

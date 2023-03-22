@@ -7,10 +7,12 @@ uint32_t now;
 void app_init_services(void) {
     devs_service_full_init(NULL);
 
-    // TODO make this conditional
+    #if 0
+    // these are now started with startHidMouse() etc
     hidkeyboard_init();
     hidmouse_init();
     hidjoystick_init();
+    #endif
 
     if (i2c_init_() == 0) {
         jd_scan_all();
