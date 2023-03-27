@@ -1,5 +1,6 @@
 #include "jdpico.h"
 #include "hardware/structs/rosc.h"
+#include "hardware/clocks.h"
 #include "pico/unique_id.h"
 #include "pico/bootrom.h"
 
@@ -21,6 +22,8 @@ uint32_t hw_random(void) {
     return jd_hash_fnv1a(buf, sizeof(buf));
 }
 
+uint8_t cpu_mhz;
+
 void platform_init(void) {
     DMESG("start!");
 
@@ -32,6 +35,8 @@ void platform_init(void) {
     pico_get_unique_board_id(&id);
     JD_ASSERT(sizeof(_jd_device_id) == sizeof(id));
     memcpy(&_jd_device_id, &id, sizeof(_jd_device_id));
+
+    cpu_mhz = clock_get_hz(clk_sys) / 1000000;
 
     tim_init();
     uart_init_();
