@@ -8,6 +8,9 @@
 		"ghcr.io/devcontainers/features/node:1": {
 			"nodeGypDependencies": true,
 			"version": "lts"
+		},
+		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+			"packages": "cmake"
 		}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
