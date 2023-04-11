@@ -1,6 +1,7 @@
 {
     "$schema": "../rp2040deviceconfig.schema.json",
     "devName": "MSR RP2040 Brain 124 v0.1",
+    "$description": "Prototype board",
     "productId": "0x3875e80d",
     "setupPins": [
         {

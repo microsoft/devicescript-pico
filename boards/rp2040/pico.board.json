@@ -1,6 +1,7 @@
 {
     "$schema": "../rp2040deviceconfig.schema.json",
     "devName": "Raspberry Pi Pico",
+    "$description": "RP2040 board from Raspberry Pi.",
     "url": "https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html",
     "productId": "0x3f6e1f0c",
     "led": {

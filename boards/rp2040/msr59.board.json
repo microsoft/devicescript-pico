@@ -1,6 +1,7 @@
 {
     "$schema": "../rp2040deviceconfig.schema.json",
     "devName": "MSR Brain RP2040 59 v0.1",
+    "$description": "Prototype board",
     "productId": "0x35a678a3",
     "jacdac": {
         "$connector": "Jacdac",

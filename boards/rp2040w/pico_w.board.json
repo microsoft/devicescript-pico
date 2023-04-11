@@ -1,6 +1,7 @@
 {
     "$schema": "../rp2040deviceconfig.schema.json",
     "devName": "Raspberry Pi Pico W",
+    "$description": "RP2040 board from Raspberry Pi with a WiFi chip.",
     "url": "https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html",
     "productId": "0x3a513204",
     "pins": {
