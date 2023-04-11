@@ -85,12 +85,15 @@ rg: all
 gdb: prep-build-gdb
 	arm-none-eabi-gdb --command=$(BUILD)/debug.gdb $(ELF)
 
-bump:
+update-devs: devicescript/cli/built/devicescript-cli.cjs
+	node devicescript/scripts/bumparch.mjs --update
+
+bump: update-devs
 	node devicescript/scripts/bumparch.mjs
 
 concat-configs:
 	mkdir -p dist
-	$(CLI) binpatch --slug microsoft/jacdac-pico --generic --uf2 $(UF2) --outdir dist boards/$(BUILD_ARCH)/*.board.json
+	$(CLI) binpatch --slug microsoft/devicescript-pico --generic --uf2 $(UF2) --outdir dist boards/$(BUILD_ARCH)/*.board.json
 
 # also keep ELF file for addr2line
 .PHONY: dist
