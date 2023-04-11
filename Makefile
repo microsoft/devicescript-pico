@@ -18,7 +18,7 @@ endif
 all: submodules refresh-version
 	cd $(BUILD) && cmake ../.. $(CMAKE_OPTIONS)
 	$(MAKE) -j16 -C $(BUILD)
-	$(MAKE) concat-configs
+	$(MAKE) patch
 
 r: flash
 f: flash
@@ -91,9 +91,14 @@ update-devs: devicescript/cli/built/devicescript-cli.cjs
 bump: update-devs
 	node devicescript/scripts/bumparch.mjs
 
-concat-configs:
+patch:
 	mkdir -p dist
 	$(CLI) binpatch --slug microsoft/devicescript-pico --generic --uf2 $(UF2) --outdir dist boards/$(BUILD_ARCH)/*.board.json
+
+fake-dist:
+	rm -rf dist/
+	$(MAKE) BUILD_ARCH=rp2040 patch
+	$(MAKE) BUILD_ARCH=rp2040w patch
 
 # also keep ELF file for addr2line
 .PHONY: dist
