@@ -96,7 +96,7 @@ void hw_panic(void) {
     for (;;)
         led_panic_blink();
 #else
-    for (int i = 0; i < 60000000; ++i) {
+    for (int i = 0; i < 60; ++i) {
         led_panic_blink();
     }
     target_reset();
