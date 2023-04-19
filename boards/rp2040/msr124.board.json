@@ -3,13 +3,10 @@
     "devName": "MSR RP2040 Brain 124 v0.1",
     "$description": "Prototype board",
     "productId": "0x3875e80d",
-    "setupPins": [
-        {
-            "#": "Enable hi-power limiter mode",
-            "pin": 18,
-            "out": 0
-        }
-    ],
+    "sPin": {
+        "#": "enable high power limiter mode",
+        "@HILIM": 0
+    },
     "jacdac": {
         "$connector": "Jacdac",
         "pin": 9
@@ -44,7 +41,8 @@
         "P26": 26,
         "P27": 27,
         "P28": 28,
-        "P29": 29
+        "P29": 29,
+        "@HILIM": 18
     },
     "log": {
         "pinTX": 0,

@@ -174,6 +174,9 @@ void pin_setup_output_af(int pin, int af) {
 void pwr_enter_no_sleep(void) {}
 void pwr_enter_tim(void) {}
 void pwr_leave_tim(void) {}
+void pwr_enter_pll(void) {}
+void pwr_leave_pll(void) {}
+void power_pin_enable(int en) {}
 
 void exti_set_callback(uint8_t pin, cb_t callback, uint32_t flags) {
     exti_cb[pin] = callback;
