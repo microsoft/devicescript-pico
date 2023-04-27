@@ -2,8 +2,6 @@
 #include "hardware/irq.h"
 
 #define ALARM_NUM 0
-uint16_t tim_max_sleep;
-
 static cb_t timer_cb;
 static volatile uint32_t int0;
 static volatile uint32_t int1;
@@ -63,8 +61,8 @@ void tim_set_timer(int delta, cb_t cb) {
     if (delta < 10)
         delta = 10;
 
-    if (tim_max_sleep && delta == 10000)
-        delta = tim_max_sleep;
+    if (delta == JD_MIN_MAX_SLEEP)
+        delta = jd_max_sleep;
 
     target_disable_irq();
     timer_cb = cb;

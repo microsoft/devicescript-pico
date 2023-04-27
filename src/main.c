@@ -41,10 +41,9 @@ int main() {
     platform_init();
     jd_init();
 
-    tim_max_sleep = 1000;
-
     while (true) {
         jd_process_everything();
+        jd_set_max_sleep(1000); // TODO?
 #if JD_WIFI
         jd_tcpsock_process();
 #endif
