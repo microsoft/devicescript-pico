@@ -27,8 +27,6 @@
 
 #define JD_USB_BRIDGE 1
 
-#define JD_SEND_FRAME_SIZE 1024
-
 #define JD_LSTORE 0
 
 #define JD_SETTINGS_LARGE 1
