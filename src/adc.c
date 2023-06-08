@@ -26,7 +26,7 @@ uint16_t adc_read_pin(uint8_t pin) {
     return adc_read() << 4;
 }
 
-uint16_t adc_read_temp(void) {
+int32_t adc_read_temp(void) {
     init();
     adc_set_temp_sensor_enabled(true);
     adc_select_input(4);
