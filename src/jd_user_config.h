@@ -45,4 +45,6 @@
 #define JD_I2C_HELPERS 1
 #define JD_HID 1
 
+#define JD_CONFIG_TEMPERATURE 1
+
 #endif
