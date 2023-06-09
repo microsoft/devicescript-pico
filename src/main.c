@@ -16,7 +16,7 @@ void app_init_services(void) {
 
     if (i2c_init_() == 0) {
         jd_scan_all();
-        i2cserv_init();
+        // i2cserv_init();
     }
 }
 
