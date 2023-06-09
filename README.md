@@ -1,22 +1,53 @@
 # Jacdac+DeviceScript for RP2040
 
-To build just run `make` - this will clone submodules and invoke `cmake` as appropriate.
-Do not clone with `--recursive` unless you want to wait a long time - just run `make`.
+This project is the DeviceScript runtime for the Raspberry Pi Pico/Pico W. DeviceScript brings a TypeScript developer experience to low-resource microcontroller-based devices.
+DeviceScript is compiled to a custom VM bytecode, which can run in very constrained
+environments.
 
-You will need ARM GCC and node.js installed as well - some of our
+-   [Read the documentation](https://microsoft.github.io/devicescript)
+
+> Technical Preview - Join the <a href="https://github.com/microsoft/devicescript/discussions">discussions</a> to provide feedback.
+
+## Setup
+
+- install CMake
+- you will need ARM GCC and node.js installed as well - some of our
 [instructions for STM32 build](https://github.com/microsoft/jacdac-stm32x0/blob/main/README.md#setup)
 may apply.
 
+## Development
+
+To build run `make` - this will clone submodules and invoke `cmake` as appropriate.
+Do not clone with `--recursive` unless you want to wait a long time - just run `make`.
+
+```bash
+make
+```
+
 Once you build, copy `build/src/devsrunner.uf2` to the RPI-RP2 drive.
+
+### Debugging
 
 Debugging is set up for Black Magic Probe. 
 You can convert a [$3 Bluepill board into Black Magic Probe](https://github.com/mmoskal/blackmagic-bluepill).
 Run `make gdb` to run GDB.
 
-One you have the firmware running, head to https://aka.ms/jacdac and press "CONNECT" in top-right corner,
-and then "CONNECT SERIAL" (not "CONNECT USB").
-Then head to "Device Dashboard" (Jacdac "logo" (connector icon) next to "CONNECT" button).
-You should see widgets for power service, DeviceScript and HID services.
+```bash
+make gdb
+```
+
+One you have the firmware running, 
+- head to https://microsoft.github.io/jacdac-docs/dashboard  and press "CONNECT" in top-right corner,
+- then "CONNECT SERIAL" (not "CONNECT USB").
+- you should see widgets for power service, DeviceScript and HID services
+
+## Publishing
+
+Run `make bump` to trigger a release.
+
+```bash
+make bump
+```
 
 ## TODO
 
