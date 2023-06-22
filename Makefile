@@ -93,12 +93,12 @@ bump: update-devs
 
 patch:
 	mkdir -p dist
-	$(CLI) binpatch --slug microsoft/devicescript-pico --generic --uf2 $(UF2) --outdir dist boards/$(BUILD_ARCH)/*.board.json
+	$(CLI) binpatch --slug microsoft/devicescript-pico --generic --uf2 $(UF2) --outdir dist boards/$(BUILD_ARCH)/*.board.json $(PATCH_ARGS)
 
 fake-dist:
 	rm -rf dist/
-	$(MAKE) BUILD_ARCH=rp2040 patch
-	$(MAKE) BUILD_ARCH=rp2040w patch
+	$(MAKE) BUILD_ARCH=rp2040 PATCH_ARGS=--fake  patch
+	$(MAKE) BUILD_ARCH=rp2040w PATCH_ARGS=--fake patch
 
 # also keep ELF file for addr2line
 .PHONY: dist

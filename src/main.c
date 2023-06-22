@@ -5,7 +5,7 @@
 uint32_t now;
 
 void app_init_services(void) {
-    devs_service_full_init(NULL);
+    devs_service_full_init();
 
     #if 0
     // these are now started with startHidMouse() etc
