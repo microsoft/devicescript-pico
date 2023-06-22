@@ -130,3 +130,13 @@ int target_in_irq(void) {
 void __libc_init_array(void) {
     // do nothing - not using static constructors
 }
+
+void jd_crypto_get_random(uint8_t *buf, unsigned size) {
+    for (unsigned i = 0; i < size; i += 4) {
+        uint32_t v = hw_random();
+        if (size - i < 4)
+            memcpy(buf + i, &v, size - i);
+        else
+            memcpy(buf + i, &v, 4);
+    }
+}
