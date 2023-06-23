@@ -49,6 +49,7 @@ int main() {
 #if JD_WIFI
         jd_tcpsock_process();
 #endif
+        jd_spi_process();
         if (dmesg_to_stdout())
             continue;
         if (!jd_rx_has_frame())

@@ -38,4 +38,7 @@ void exti_enable(uint8_t pin);
 
 bool uart_log_can_write(void);
 void uart_log_write(const void *buf, unsigned size);
+void uart_log_sync_pin(void);
 void uart_log_init(void);
+
+void jd_spi_process(void);
