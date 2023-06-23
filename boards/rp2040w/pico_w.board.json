@@ -4,6 +4,11 @@
     "$description": "RP2040 board from Raspberry Pi with a WiFi chip.",
     "url": "https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html",
     "productId": "0x3a513204",
+    "led": {
+        "#": "type=100 - special handling for Pico LED",
+        "type": 100,
+        "pin": 25
+    },
     "pins": {
         "P0": 0,
         "P1": 1,

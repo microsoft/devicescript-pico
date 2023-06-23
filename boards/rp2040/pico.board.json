@@ -5,6 +5,8 @@
     "url": "https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html",
     "productId": "0x3f6e1f0c",
     "led": {
+        "#": "type=100 - special handling for Pico LED",
+        "type": 100,
         "pin": 25
     },
     "pins": {

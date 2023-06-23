@@ -178,6 +178,106 @@
             ],
             "type": "object"
         },
+        "GamepadConfig": {
+            "additionalProperties": false,
+            "properties": {
+                "#": {
+                    "description": "All fields starting with '#' arg ignored",
+                    "type": "string"
+                },
+                "activeHigh": {
+                    "description": "Buttons are normally active-low and pulled high.\nThis makes them active-high and pulled low.",
+                    "type": "boolean"
+                },
+                "name": {
+                    "description": "Instance/role name to be assigned to service.",
+                    "examples": [
+                        "buttonA",
+                        "activityLed"
+                    ],
+                    "type": "string"
+                },
+                "pinA": {
+                    "description": "Pin for button A",
+                    "type": "integer"
+                },
+                "pinAX": {
+                    "description": "When gamepad is analog, set this to horizontal pin.",
+                    "type": "integer"
+                },
+                "pinAY": {
+                    "description": "When gamepad is analog, set this to vertical pin.",
+                    "type": "integer"
+                },
+                "pinB": {
+                    "description": "Pin for button B",
+                    "type": "integer"
+                },
+                "pinDown": {
+                    "description": "Pin for button Down",
+                    "type": "integer"
+                },
+                "pinExit": {
+                    "description": "Pin for button Exit",
+                    "type": "integer"
+                },
+                "pinHigh": {
+                    "description": "Pin to pull high before analog read and release afterwards.",
+                    "type": "integer"
+                },
+                "pinLeft": {
+                    "description": "Pin for button Left",
+                    "type": "integer"
+                },
+                "pinLow": {
+                    "description": "Pin to pull low before analog read and release afterwards.",
+                    "type": "integer"
+                },
+                "pinMenu": {
+                    "description": "Pin for button Menu",
+                    "type": "integer"
+                },
+                "pinReset": {
+                    "description": "Pin for button Reset",
+                    "type": "integer"
+                },
+                "pinRight": {
+                    "description": "Pin for button Right",
+                    "type": "integer"
+                },
+                "pinSelect": {
+                    "description": "Pin for button Select",
+                    "type": "integer"
+                },
+                "pinUp": {
+                    "description": "Pin for button Up",
+                    "type": "integer"
+                },
+                "pinX": {
+                    "description": "Pin for button X",
+                    "type": "integer"
+                },
+                "pinY": {
+                    "description": "Pin for button Y",
+                    "type": "integer"
+                },
+                "service": {
+                    "enum": [
+                        "gamepad"
+                    ],
+                    "type": "string"
+                },
+                "variant": {
+                    "description": "Service variant (see service definition for possible values).",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "name",
+                "service"
+            ],
+            "type": "object"
+        },
         "HexInt": {
             "type": [
                 "string",
@@ -587,6 +687,51 @@
             "required": [
                 "name",
                 "pin",
+                "service"
+            ],
+            "type": "object"
+        },
+        "MotorConfig": {
+            "additionalProperties": false,
+            "properties": {
+                "#": {
+                    "description": "All fields starting with '#' arg ignored",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Instance/role name to be assigned to service.",
+                    "examples": [
+                        "buttonA",
+                        "activityLed"
+                    ],
+                    "type": "string"
+                },
+                "pin1": {
+                    "description": "The channel 1 pin.",
+                    "type": "integer"
+                },
+                "pin2": {
+                    "description": "The channel 2 pin.",
+                    "type": "integer"
+                },
+                "pinEnable": {
+                    "description": "The enable (NSLEEP) pin if any, active high.",
+                    "type": "integer"
+                },
+                "service": {
+                    "enum": [
+                        "motor"
+                    ],
+                    "type": "string"
+                },
+                "variant": {
+                    "description": "Service variant (see service definition for possible values).",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "name",
+                "pin1",
                 "service"
             ],
             "type": "object"
@@ -1396,6 +1541,9 @@
                     "$ref": "#/definitions/MotionConfig"
                 },
                 {
+                    "$ref": "#/definitions/MotorConfig"
+                },
+                {
                     "$ref": "#/definitions/LightBulbConfig"
                 },
                 {
@@ -1433,6 +1581,9 @@
                 },
                 {
                     "$ref": "#/definitions/HidMouseConfig"
+                },
+                {
+                    "$ref": "#/definitions/GamepadConfig"
                 }
             ]
         },
@@ -1803,7 +1954,7 @@
             "description": "Offset where FSTOR sits in total flash space."
         },
         "fstorPages": {
-            "description": "Total number of pages in FSTOR. \nOften 32 (for 128k) or 64 (for 256k).",
+            "description": "Total number of pages in FSTOR.\nOften 32 (for 128k) or 64 (for 256k).",
             "type": "integer"
         },
         "i2c": {

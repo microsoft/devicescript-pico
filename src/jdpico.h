@@ -42,3 +42,5 @@ void uart_log_sync_pin(void);
 void uart_log_init(void);
 
 void jd_spi_process(void);
+extern bool is_pico_w;
+void pico_w_set_led(uint8_t r, uint8_t g, uint8_t b);

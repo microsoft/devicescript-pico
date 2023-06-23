@@ -3,6 +3,7 @@
 #include "hardware/clocks.h"
 #include "pico/unique_id.h"
 #include "pico/bootrom.h"
+#include "services/interfaces/jd_adc.h"
 
 #include <stdlib.h>
 
@@ -24,8 +25,54 @@ uint32_t hw_random(void) {
 
 uint8_t cpu_mhz;
 
+bool is_pico_w;
+static uint8_t use_pico_led;
+static void pico_w_init(void) {
+    pin_setup_analog_input(29);
+    if (adc_read_pin(29) < 3264) {
+        is_pico_w = 1;
+    } else {
+        pin_set(25, 0);
+        pin_setup_output(25);
+        if (adc_read_pin(29) < 3264)
+            is_pico_w = 1;
+        else
+            is_pico_w = 0;
+        pin_setup_analog_input(25);
+    }
+    DMESG("board is: Pico%s", is_pico_w ? " W" : "");
+}
+
+bool jd_wifi_available(void) {
+    return is_pico_w;
+}
+
+void jd_rgbext_init(int type, uint8_t pin) {
+    if (type == 100) {
+        use_pico_led = pin;
+        if (!is_pico_w)
+            pin_setup_output(use_pico_led);
+    }
+}
+
+void jd_rgbext_set(uint8_t r, uint8_t g, uint8_t b) {
+    if (!use_pico_led)
+        return;
+    if (is_pico_w) {
+#if JD_WIFI
+        pico_w_set_led(r, g, b);
+#endif
+    } else {
+        pin_set(use_pico_led, r > 0 || g > 0 || b > 0);
+    }
+}
+
 void platform_init(void) {
     DMESG("start!");
+
+    // detect pico-W early - it messes with pins
+    if (dcfg_get_i32("led.type", 0) == 100)
+        pico_w_init();
 
     uint32_t r = hw_random();
     DMESG("rand %x", r);
