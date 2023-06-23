@@ -114,7 +114,7 @@ int jd_spi_xfer(const void *txdata, void *rxdata, unsigned numbytes, cb_t done_f
     }
 
     spi_in_use = true;
-    dma_set_ch_cb(dma_rx, spi_dma_cb, done_fn);
+    dma_set_ch_cb(rxdata ? dma_rx : dma_tx, spi_dma_cb, done_fn);
     dma_start_channel_mask(start_ch);
 
     return 0;
