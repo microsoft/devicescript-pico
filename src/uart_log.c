@@ -9,6 +9,7 @@
 
 static int dmachTx = -1;
 static bool in_tx;
+static uint8_t prev_tx_pin;
 
 static void stdio_uart_out_chars(const char *buf, int length) {
     jd_dmesg_write(buf, length);
@@ -23,7 +24,7 @@ stdio_driver_t stdio_dmesg = {
     .in_chars = stdio_uart_in_chars,
 };
 
-void uart_log_init() {
+void uart_log_init(void) {
     uint8_t tx_pin = dcfg_get_pin("log.pinTX");
 
     if (tx_pin != NO_PIN && ((tx_pin & 3) != 0)) {
@@ -44,7 +45,22 @@ void uart_log_init() {
         gpio_set_function(tx_pin, GPIO_FUNC_UART);
     }
 
+    prev_tx_pin = tx_pin;
+
     stdio_set_driver_enabled(&stdio_dmesg, true);
+}
+
+void uart_log_sync_pin(void) {
+    uint8_t tx_pin = dcfg_get_pin("log.pinTX");
+    if (tx_pin == prev_tx_pin)
+        return;
+    if (tx_pin != NO_PIN && ((tx_pin & 3) != 0)) {
+        DMESG("! invalid log.pinTX");
+        return;
+    }
+    pin_setup_analog_input(prev_tx_pin);
+    prev_tx_pin = tx_pin;
+    gpio_set_function(tx_pin, GPIO_FUNC_UART);
 }
 
 bool uart_log_can_write(void) {
