@@ -87,6 +87,7 @@ uint8_t jd_pwm_init(uint8_t pin, uint32_t period, uint32_t duty, uint8_t prescal
 
     uint slice_num = pwm_gpio_to_slice_num(pin);
     pwm_init(slice_num, &c, true);
+    pwm_set_gpio_level(pin, duty);
 
     gpio_set_function_(pin, GPIO_FUNC_PWM);
 
