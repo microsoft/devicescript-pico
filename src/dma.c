@@ -63,7 +63,7 @@ void dma_set_ch_cb(uint8_t channel, cb_arg_t handler, void *context) {
     JD_ASSERT(!dmaHandler[channel].handler);
     dmaHandler[channel].handler = handler;
     dmaHandler[channel].context = context;
-    dma_hw->ints0 = (1 << DMA_IRQ_0); // clear any pending irq
+    dma_hw->ints0 = (1 << channel); // clear any pending irq
     dma_channel_set_irq0_enabled(channel, true);
     ram_irq_set_enabled(DMA_IRQ_0, true);
 }
