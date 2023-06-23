@@ -5,6 +5,7 @@
     "url": "https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html",
     "productId": "0x3a513204",
     "pins": {
+        "P0": 0,
         "P1": 1,
         "P2": 2,
         "P3": 3,
@@ -30,9 +31,5 @@
         "P26": 26,
         "P27": 27,
         "P28": 28
-    },
-    "log": {
-        "pinTX": 0,
-        "baud": 115200
     }
 }

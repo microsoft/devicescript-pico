@@ -60,7 +60,10 @@ void uart_log_sync_pin(void) {
     }
     pin_setup_analog_input(prev_tx_pin);
     prev_tx_pin = tx_pin;
-    gpio_set_function(tx_pin, GPIO_FUNC_UART);
+    if (dmachTx == -2)
+        uart_log_init();
+    else
+        gpio_set_function(tx_pin, GPIO_FUNC_UART);
 }
 
 bool uart_log_can_write(void) {
