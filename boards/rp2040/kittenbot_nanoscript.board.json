@@ -1,7 +1,7 @@
 {
     "$schema": "../rp2040deviceconfig.schema.json",
-    "devName": "NanoScript 1.0",
-    "$description": "NanoScript board from KittenBot",
+    "devName": "KittenBot NanoScript 1.0",
+    "$description": "A RP2040 board featuring a Jacdac connector, compatible with SMT-mounting.",
     "productId": "0x3aa50e69",
     "sPin": {
         "#": "enable high power limiter mode",
